@@ -27,9 +27,12 @@ func (r *entityResolver) FindProductByID(ctx context.Context, id string) (*gener
 }
 
 // FindUserByID is the resolver for the findUserByID field.
-func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*generated.User, error) {
+func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*models.User, error) {
+	fmt.Printf("🚨🚨🚨 FindUserByID called for user ID: %s 🚨🚨🚨\n", id)
 	user := &models.User{ID: id}
-	return ToGraphQLUser(user), nil
+	result := ToGraphQLUser(user)
+	fmt.Printf("🚨🚨🚨 FindUserByID returning user: %+v 🚨🚨🚨\n", result)
+	return result, nil
 }
 
 // Entity returns generated.EntityResolver implementation.

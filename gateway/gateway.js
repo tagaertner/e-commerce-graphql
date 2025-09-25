@@ -1,4 +1,4 @@
-const { ApolloGateway, IntrospectAndCompose } = require("@apollo/gateway");
+const { ApolloGateway, IntrospectAndCompose, RemoteGraphQLDataSource } = require("@apollo/gateway");
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
 const { ApolloServerPluginLandingPageLocalDefault } = require("@apollo/server/plugin/landingPage/default");
@@ -15,9 +15,21 @@ async function startServer() {
           { name: "users", url: "http://users:4002/query" },
           { name: "orders", url: "http://orders:4003/query" },
         ],
+        introspectionHeaders: {
+          'User-Agent': 'ApolloGateway/2.5.5'
+        }
       }),
       // Poll every 10 seconds for schema changes
       pollIntervalInMs: 10000,
+      // Add explicit federation configuration
+      buildService: ({ url }) => {
+        return new RemoteGraphQLDataSource({
+          url,
+          willSendRequest: ({ request, context }) => {
+            request.http.headers.set('apollo-federation-include-trace', 'ftv1');
+          },
+        });
+      },
     });
 
     // Create Apollo Server with the gateway

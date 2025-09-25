@@ -15,7 +15,7 @@ type Order @key(fields: "id") {
 
 extend type User @key(fields: "id") {
   id: ID! @external
-  orders: [Order!]
+  orders: [Order]
 }
 
 extend type Product @key(fields: "id") {

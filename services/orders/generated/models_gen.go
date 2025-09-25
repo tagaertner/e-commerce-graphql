@@ -10,14 +10,14 @@ type Mutation struct {
 }
 
 type Order struct {
-	ID         string      `json:"id"`
-	UserID     string      `json:"userId"`
-	User       *User       `json:"user"`
-	Products   []*Product  `json:"products"`
-	Quantity   int         `json:"quantity"`
-	TotalPrice float64     `json:"totalPrice"`
-	Status     string      `json:"status"`
-	CreatedAt  models.Time `json:"createdAt"`
+	ID         string       `json:"id"`
+	UserID     string       `json:"userId"`
+	User       *models.User `json:"user"`
+	Products   []*Product   `json:"products"`
+	Quantity   int          `json:"quantity"`
+	TotalPrice float64      `json:"totalPrice"`
+	Status     string       `json:"status"`
+	CreatedAt  models.Time  `json:"createdAt"`
 }
 
 func (Order) IsEntity() {}
@@ -31,10 +31,3 @@ func (Product) IsEntity() {}
 
 type Query struct {
 }
-
-type User struct {
-	ID     string   `json:"id"`
-	Orders []*Order `json:"orders,omitempty"`
-}
-
-func (User) IsEntity() {}

@@ -1,8 +1,6 @@
 module github.com/tagaertner/e-commerce-graphql
 
-go 1.23.0
-
-toolchain go1.24.0
+go 1.24.0
 
 require (
 	github.com/99designs/gqlgen v0.17.78
@@ -27,9 +25,10 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/sosodev/duration v1.3.1 // indirect
 	github.com/stretchr/testify v1.11.1 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
-	golang.org/x/sync v0.16.0 // indirect
-	golang.org/x/text v0.27.0 // indirect
+	golang.org/x/crypto v0.42.0 // indirect
+	golang.org/x/net v0.44.0 // indirect
+	golang.org/x/sync v0.17.0 // indirect
+	golang.org/x/text v0.29.0 // indirect
 )
 
 replace github.com/tagaertner/e-commerce-graphql/services/users => ./services/users

@@ -86,34 +86,33 @@ func (r *queryResolver) OrdersByUser(ctx context.Context, userID string) ([]*gen
 	return ToGraphQLOrders(orders), nil
 }
 
+// Orders is the resolver for the orders field.
+func (r *userResolver) Orders(ctx context.Context, obj *models.User) ([]*generated.Order, error) {
+	fmt.Printf("🚨🚨🚨 USERRESOLVER CALLED FOR USER ID: %s 🚨🚨🚨\n", obj.ID)
+
+	// Get real orders from the database
+	orders, err := r.OrderService.GetOrdersByUserID(obj.ID)
+	if err != nil {
+		fmt.Printf("❌ Error getting orders for user %s: %v\n", obj.ID, err)
+		return []*generated.Order{}, nil
+	}
+	if orders == nil {
+		orders = []*models.Order{}
+	}
+
+	fmt.Printf("✅ Found %d orders for user %s\n", len(orders), obj.ID)
+	return ToGraphQLOrders(orders), nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+// User returns generated.UserResolver implementation.
+func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
+
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *userResolver) Orders(ctx context.Context, obj *generated.User) ([]*generated.Order, error) {
-    orders, err := r.OrderService.GetOrdersByUserID(obj.ID)
-    if err != nil {
-        return nil, err
-    }
-    return ToGraphQLOrders(orders), nil
-}
-func (r *createOrderInputResolver) ProductIds(ctx context.Context, obj *models.CreateOrderInput, data []string) error {
-	panic(fmt.Errorf("not implemented: ProductIds - productIds"))
-}
-func (r *Resolver) CreateOrderInput() generated.CreateOrderInputResolver {
-	return &createOrderInputResolver{r}
-}
-type createOrderInputResolver struct{ *Resolver }
-*/
+type userResolver struct{ *Resolver }

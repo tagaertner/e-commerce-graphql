@@ -22,6 +22,12 @@ models:
     model: github.com/tagaertner/e-commerce-graphql/services/orders/models.ChangeOrderQuantityInput
   Time:
     model: github.com/tagaertner/e-commerce-graphql/services/orders/models.Time
+  User:
+    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.User
+  Order:
+    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.Order
+  Product:
+    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.Product
 
 resolver:
   layout: follow-schema
