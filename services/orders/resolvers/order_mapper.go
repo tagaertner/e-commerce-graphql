@@ -6,15 +6,22 @@ import (
 )
 
 func ToGraphQLOrder(o *models.Order) *generated.Order {
-	return &generated.Order{
-		ID:         o.ID,
-		UserID:     o.UserID,
-		ProductID:  o.ProductID,
-		Quantity:   o.Quantity,
-		TotalPrice: o.TotalPrice,
-		Status:     o.Status,
-		CreatedAt:  o.CreatedAt,
-	}
+    var gqlProducts []*generated.Product
+    for _, p := range o.Products {
+        gqlProducts = append(gqlProducts, &generated.Product{
+            ID:   p.ID,
+            Name: p.Name,   
+        })
+    }
+    return &generated.Order{
+        ID:         o.ID,
+        UserID:     o.UserID,
+        Products:   gqlProducts,
+        Quantity:   o.Quantity,
+        TotalPrice: o.TotalPrice,
+        Status:     o.Status,
+        CreatedAt:  o.CreatedAt,
+    }
 }
 
 func ToGraphQLOrders(orders []*models.Order) []*generated.Order {

@@ -12,9 +12,8 @@ type Mutation struct {
 type Order struct {
 	ID         string      `json:"id"`
 	UserID     string      `json:"userId"`
-	ProductID  string      `json:"productId"`
-	User       *User       `json:"user,omitempty"`
-	Product    *Product    `json:"product,omitempty"`
+	User       *User       `json:"user"`
+	Products   []*Product  `json:"products"`
 	Quantity   int         `json:"quantity"`
 	TotalPrice float64     `json:"totalPrice"`
 	Status     string      `json:"status"`
@@ -24,7 +23,8 @@ type Order struct {
 func (Order) IsEntity() {}
 
 type Product struct {
-	ID string `json:"id"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 func (Product) IsEntity() {}

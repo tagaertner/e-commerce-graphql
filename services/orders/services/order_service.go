@@ -36,21 +36,27 @@ func (s *OrderService) GetOrderByID(id string) (*models.Order, error) {
 
 func (s *OrderService) GetOrdersByUserID(userID string) ([]*models.Order, error) {
 	var orders []*models.Order
-	if err := s.db.Where("user_id = ?", userID).Find(&orders).Error; err != nil {
-		return nil, err
+	if err := s.db.
+        Where("user_id = ?", userID).
+        Preload("Products").
+        Find(&orders).Error; err != nil {
+        return nil, err
 	}
 	return orders, nil
 }
 
-func (s *OrderService)CreateOrder(ctx context.Context, userId string, productId string, quantity int, totalPrice float64, status string, createdAt time.Time ) (*models.Order, error){
+func (s *OrderService)CreateOrder(ctx context.Context, userId string, productIds [] string, quantity int, totalPrice float64, status string, createdAt time.Time ) (*models.Order, error){
 	order := &models.Order {
 		ID: fmt.Sprintf("order_%d", time.Now().UnixNano()),
 		UserID: userId,
-		ProductID: productId,
 		Quantity: quantity,
 		TotalPrice: totalPrice,
 		Status: status,
 		CreatedAt: models.Time(createdAt),
+	}
+
+	for _, pid := range productIds {
+		order.Products = append(order.Products, models.Product{ID: pid})
 	}
 	if err := s.db.WithContext(ctx).Create(order).Error; err != nil {
 		return nil, err

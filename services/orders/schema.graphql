@@ -2,28 +2,25 @@ extend schema @link(url: "https://specs.apollographql.com/federation/v2.0", impo
 
 scalar Time
 
-type User @key(fields: "id") {
-  id: ID!
-}
-
-type Product @key(fields: "id") {
-  id: ID!
-}
-
 type Order @key(fields: "id") {
   id: ID!
   userId: ID!
-  productId: ID!
-  user: User @provides(fields: "id")
-  product: Product @provides(fields: "id")
+  user: User!
+  products: [Product!]!
   quantity: Int!
   totalPrice: Float!
   status: String!
   createdAt: Time!
 }
 
-extend type User {
-  orders: [Order]
+extend type User @key(fields: "id") {
+  id: ID! @external
+  orders: [Order!]
+}
+
+extend type Product @key(fields: "id") {
+  id: ID! @external
+  name: String!
 }
 
 type Query {
@@ -34,7 +31,7 @@ type Query {
 
 input CreateOrderInput {
   userId: ID!
-  productId: ID!
+  productIds: [ID!]!
   quantity: Int!
   totalPrice: Float!
   status: String!

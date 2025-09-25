@@ -9,8 +9,29 @@ import (
 	"gorm.io/gorm"
 	"time"
 )
+type Order struct {
+	ID	string	`gorm:"primaryKey"`
+	UserID string
+	Quantity int
+	TotalPrice float64
+	Status string
+	CreatAt time.Time
+	Products []Product `gorm:"many2many:order_products;"`
+}
 
+type Product struct {
+	ID string `gorm:"primaryKey"`
+}
 func Connect() *gorm.DB {
+
+		// Debug: Print environment variables
+	fmt.Printf("🔍 DEBUG - Environment variables:\n")
+	fmt.Printf("   DB_HOST: '%s'\n", os.Getenv("DB_HOST"))
+	fmt.Printf("   DB_PORT: '%s'\n", os.Getenv("DB_PORT"))
+	fmt.Printf("   POSTGRES_USER: '%s'\n", os.Getenv("POSTGRES_USER"))
+	fmt.Printf("   POSTGRES_PASSWORD: '%s'\n", os.Getenv("POSTGRES_PASSWORD"))
+	fmt.Printf("   POSTGRES_DB: '%s'\n", os.Getenv("POSTGRES_DB"))
+
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		os.Getenv("DB_HOST"),
@@ -19,6 +40,9 @@ func Connect() *gorm.DB {
 		os.Getenv("POSTGRES_DB"),
 		os.Getenv("DB_PORT"),
 	)
+
+	fmt.Printf("🔍 DEBUG - Full DSN: '%s'\n", dsn)
+
 	maxRetries := 20
 	retryDelay := 3 * time.Second
 
@@ -41,5 +65,5 @@ func Connect() *gorm.DB {
 }
 
 func RunMigrations(db *gorm.DB) {
-	db.AutoMigrate(&models.Order{})
+	db.AutoMigrate(&models.Order{}, &models.Product{})
 }

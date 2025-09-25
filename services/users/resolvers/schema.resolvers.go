@@ -44,6 +44,8 @@ func (r *queryResolver) User(ctx context.Context, id string) (*models.User, erro
 	return user, nil
 }
 
+
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
