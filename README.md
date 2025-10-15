@@ -68,7 +68,7 @@ A demonstration of a microservices architecture using **Go** and **Node.js**, bu
    - Gateway will start and compose the federated schema
 
 4. **Open GraphQL Playground:**
-   👉 [http://localhost:4000](http://localhost:4000)
+   👉 [http://localhost:](http://localhost:4000)
 
 You can now run live GraphQL queries against the federated services.
 
@@ -98,7 +98,7 @@ query {
     id
     name
     email
-    orders {
+    orders {4000
       id
       productId
       quantity
