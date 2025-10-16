@@ -1,22 +1,68 @@
 package services
 
-// import (
-// 	"testing"
+import (
+	"context"
+	"testing"
+	"time"
 
-// 	"github.com/stretchr/testify/assert"
-// 	"github.com/stretchr/testify/mock"
-// 	"github.com/tagaertner/e-commerce-graphql/services/orders/models"
-// 	"gorm.io/gorm"
-// )
+	"github.com/stretchr/testify/assert"
+	"github.com/tagaertner/e-commerce-graphql/services/orders/models"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+)
 
-// type MockDB struct {
-// 	mock.Mock
-// }
+// MockOrderRepository is a mock implementation of the repository interface.
+func setupTestDB(t *testing.T) *gorm.DB {
+	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("failed to connect test databaseL %v", err)
+	}
+	db.AutoMigrate(&models.Order{})
+	return db
+}
 
-// func TestGetAllOrders(t* testing.T){
-// 	db :=&gorm.DB{}
+// Create
+func TestCreateOrder_Success(t *testing.T) {
+    db := setupTestDB(t)
+    orderService := NewOrderService(db)
 
-// 	services := OrderService{db: db}
+    ctx := context.Background()
 
-	
-// }
+    created, err := orderService.CreateOrder(
+        ctx,
+        "1",                 // userID
+        []string{"101"},     // productIDs
+        2,                   // quantity
+        49.99,               // totalPrice
+        "pending",           // status
+        time.Now(),          // createdAt
+    )
+
+    assert.NoError(t, err)
+    assert.NotEmpty(t, created.ID)
+    assert.Equal(t, "1", created.UserID)
+    assert.Equal(t, float64(49.99), created.TotalPrice)
+    assert.Equal(t, "pending", created.Status)
+}
+
+// Failure Missing filed
+
+// todo GEt
+// orderby userID success
+// orderbyUserId failure noResutls
+
+//todo update
+// orderStatus success
+// orderstatus fail invalid id
+
+
+// todo Delet
+// Order sucess
+// order failer invaid id 
+
+
+
+
+// Example GraphQL E2E tests:
+//•	✅ TestQueryOrders — queries all orders and checks response shape.
+//•	✅ TestMutationCreateOrder — hits GraphQL mutation (optional).
