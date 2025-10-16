@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// MockOrderRepository is a mock implementation of the repository interface.
+// 
 func setupTestDB(t *testing.T) *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	if err != nil {
@@ -46,9 +46,32 @@ func TestCreateOrder_Success(t *testing.T) {
 }
 
 // Failure Missing filed
+func TestCreateOrder_Failure(t *testing.T){
+	db := setupTestDB(t)
+    orderService := NewOrderService(db)
 
+    ctx := context.Background()
+
+    created, err := orderService.CreateOrder(
+        ctx,
+        "",                 // userID
+        []string{""},     // productIDs
+        2,                   // quantity
+        49.99,               // totalPrice
+        "pending",           // status
+        time.Now(),          // createdAt
+    )
+
+    assert.EqualError(t, err, "invalid order input: missing or invalid fields")
+    assert.Nil(t, created, "order should not be created when userID or productIDs are invalid")
+   
+
+}
 // todo GEt
-// orderby userID success
+// Getorderby userID success
+func TestGetOrderByUserId_success(t *testing.T){
+
+}
 // orderbyUserId failure noResutls
 
 //todo update

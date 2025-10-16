@@ -55,6 +55,10 @@ func (s *OrderService)CreateOrder(ctx context.Context, userId string, productIds
 		CreatedAt: models.Time(createdAt),
 	}
 
+	if userId == "" || len(productIds) == 0 || quantity <= 0 || totalPrice <= 0 {
+		return nil, errors.New("invalid order input: missing or invalid fields")
+	}
+	
 	for _, pid := range productIds {
 		order.Products = append(order.Products, models.Product{ID: pid})
 	}
