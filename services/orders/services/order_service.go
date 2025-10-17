@@ -39,6 +39,7 @@ func (s *OrderService) GetOrdersByUserID(userID string) ([]*models.Order, error)
 	if err := s.db.
         Where("user_id = ?", userID).
         Preload("Products").
+		Order("created_at ASC").
         Find(&orders).Error; err != nil {
         return nil, err
 	}

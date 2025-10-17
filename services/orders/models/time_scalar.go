@@ -6,7 +6,7 @@ import (
 	"io"
 	"database/sql/driver"
 )
-
+// Todo remove all file when change to simple time like job story
 type Time time.Time
 
 func (t Time) MarshalGQL(w io.Writer) {
@@ -37,4 +37,10 @@ func (t *Time) Scan(value interface{}) error{
 		return nil
 	}
 	return fmt.Errorf("cannot scan value into TIme: %v", value)
+}
+
+// Now returns the current time as a models.Time
+
+func Now() Time {
+    return Time(time.Now().UTC())
 }

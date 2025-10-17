@@ -2,24 +2,54 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
+	 _ "github.com/lib/pq" 
+	"github.com/docker/go-connections/nat"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/tagaertner/e-commerce-graphql/services/orders/models"
-	"gorm.io/driver/sqlite"
+	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/wait"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-// setupTestDB creates a new in-memory SQLite database for unit testing.
-// It runs AutoMigrate on the Order model to prepare the schema.
-// This database is isolated to the current test and discarded when the test ends.
+// setupTestDB starts a temporary Postgres container using testcontainers-go.
+// Requires Docker to be running. The container is created automatically for tests
+// and removed after they complete, providing an isolated Postgres instance that
+// matches production behavior.
 func setupTestDB(t *testing.T) *gorm.DB {
-    db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
-    if err != nil {
-        t.Fatalf("failed to connect test database: %v", err)
-    }
-    db.AutoMigrate(&models.Order{})
+    ctx := context.Background()
+	req := testcontainers.ContainerRequest{
+		Image:        "postgres:15",
+		Env: map[string]string{
+			"POSTGRES_USER":     "testuser",
+			"POSTGRES_PASSWORD": "testpass",
+			"POSTGRES_DB":       "testdb",
+		},
+		ExposedPorts: []string{"5432/tcp"},
+		WaitingFor:   wait.ForSQL("5432/tcp", "postgres", func(host string, port nat.Port) string {
+			return fmt.Sprintf("host=%s port=%s user=testuser password=testpass dbname=testdb sslmode=disable", host, port.Port())
+		}).WithStartupTimeout(60 * time.Second), // ⏳ give it a full minute
+	}
+	
+    pgContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+        ContainerRequest: req,
+        Started:          true,
+    })
+    require.NoError(t, err)
+
+    host, _ := pgContainer.Host(ctx)
+    port, _ := pgContainer.MappedPort(ctx, "5432/tcp")
+
+    dsn := fmt.Sprintf("host=%s port=%s user=testuser password=testpass dbname=testdb sslmode=disable", host, port.Port())
+    db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+    require.NoError(t, err)
+
+    require.NoError(t, db.AutoMigrate(&models.Order{}, &models.Product{}))
     return db
 }
 
@@ -43,6 +73,7 @@ func TestCreateOrder_Success(t *testing.T) {
         2,                   // quantity
         49.99,               // totalPrice
         "pending",           // status
+		// todo currently using time_scalar for time, could switch to simulate job-stories
         time.Now(),          // createdAt
     )
 
@@ -73,17 +104,108 @@ func TestCreateOrder_Failure(t *testing.T){
    
 
 }
-// todo GEt
+
 // TestGetOrdersByUserID_Success confirms that the service correctly
 // retrieves all orders for a given user from the test database.
 func TestGetOrderByUserId_success(t *testing.T){
-	// _, orderService, ctx := setupTestEnv(t)
+	db, orderService, _  := setupTestEnv(t)
+	
+	// Create some products
+	product1 := models.Product {
+		
+		ID:		"p1",
+		Name:  	"Widget",
+		Price: 	59.99,
+		Description: "Fancy widget",
+		Inventory: 40,
+		Available: true,
+	}
+
+	product2 := models.Product {
+		ID:		"p2",
+		Name:  	"Gadget",
+		Price: 	38.99,
+		Description: "Plain gadget",
+		Inventory: 51,
+		Available: true,
+	}
+	require.NoError(t, db.Create(&product1).Error)
+	require.NoError(t,db.Create(&product2).Error)
+
+	// Create two orders for user 1
+	order1 :=models.Order{
+		ID:        "o1", 
+		UserID:    "1",  
+		Products: []models.Product{product1},
+		Quantity:   1,    
+		TotalPrice: 59.99,
+		Status :    "pending",
+		CreatedAt:	models.Now(),  
+	}
+
+	order2 :=models.Order{
+		ID:        "02", 
+		UserID:    "1",  
+		Products: []models.Product{product2},
+		Quantity:   1,    
+		TotalPrice: 38.99,
+		Status :    "completed",
+		CreatedAt:	models.Now(),  
+	}
+
+	require.NoError(t, db.Create(&order1).Error)
+	require.NoError(t, db.Create(&order2).Error)
+
+	// --- Act ---
+	orders, err := orderService.GetOrdersByUserID("1")
+
+	// --- Assert ---
+	require.NoError(t, err)
+	require.Len(t, orders, 2)
+
+	foundWidget, foundGadget := false, false
+
+	for _, o := range orders {
+		require.Len(t, o.Products, 1)
+		switch o.Products[0].Name {
+		case "Widget":
+			require.Equal(t, "pending", o.Status)
+			foundWidget = true
+		case "Gadget":
+			require.Equal(t, "completed", o.Status)
+			foundGadget = true
+		}
+	}
+
+	require.True(t, foundWidget, "Widget order not found")
+	require.True(t, foundGadget, "Gadget order not found")
+	
+	// Validate preload worked
+	require.Len(t, orders[0].Products,1)
+	require.Equal(t, "Widget", orders[0].Products[0].Name)
+	require.Equal(t, "pending", orders[0].Status)
+
+	require.Len(t, orders[1].Products, 1)
+	require.Equal(t, "Gadget", orders[1].Products[0].Name)
+	require.Equal(t, "completed", orders[1].Status)
+
 }
 
 // TestGetOrdersByUserID_Failure checks that the service handles cases
 // where a user has no existing orders and returns an empty result set.
 func TestGetOrdersByUserID_Failure(t *testing.T) {
+	_, orderService, _ := setupTestEnv(t)
 
+	// --- Arrange ---
+	// No orders created for this user ("999")
+
+	// --- Act ---
+	orders, err := orderService.GetOrdersByUserID("999")
+
+	// -- Assert ---
+	require.NoError(t, err, "expected no error when querying non-existent user")
+	require.NotNil(t, orders, "expected a valid (non-nil) slice")
+	require.Len(t, orders, 0, "expected no orders for this user")
 }
 
 //todo update

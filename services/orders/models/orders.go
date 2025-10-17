@@ -1,5 +1,5 @@
 package models
-
+// todo change created_at to something simlar to "CreatedAt: s.CreatedAt.Format(time.RFC3339)," see job story story_mapper for example
 type Order struct {
 	 ID        string  `json:"id" gorm:"primarykey"`  
 	UserID     string  `json:"userId"`
@@ -19,7 +19,7 @@ type CreateOrderInput struct {
 	Quantity   int     `json:"quantity"`
 	TotalPrice float64 `json:"totalPrice"`
 	Status     string  `json:"status"`
-	CreatedAt  Time    `json:"createdAt"` 
+	CreatedAt  Time    `json:"createdAt" gorm:"autoCreateTime"`
 }
 
 type UpdateOrderInput struct {
