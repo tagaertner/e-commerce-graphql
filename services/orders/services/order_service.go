@@ -111,7 +111,7 @@ func (s *OrderService)DeleteOrder(ctx context.Context, input models.DeleteOrderI
 		return false, result.Error
 	}
 	if result.RowsAffected == 0 {
-		return false, nil
+		return false, errors.New("order not found")
 	}
 	return true, nil
 }

@@ -265,20 +265,52 @@ func TestUpdateOrderStatus_Failure(t *testing.T) {
  }
 
 
-// todo Delet
+// todo Delete
 // TestDeleteOrder_Success validates that a created order can be deleted
 // and no longer exists in the test database after deletion.
 func TestDeleteOrder_Success(t *testing.T) { 
+	db, orderService, ctx := setupTestEnv(t)
 
- }
+	// --- Arrange ---
+	order := models.Order{
+		ID:         "o1",
+		UserID:     "1",
+		TotalPrice: 10.00,
+		Status:     "pending",
+	}
+	require.NoError(t, db.Create(&order).Error)
 
+	// Capture both return values from DeleteOrder and use the created order's ID
+	_, err := orderService.DeleteOrder(ctx, models.DeleteOrderInput{
+		OrderID: order.ID,
+		UserID: "1",
+	})
+	require.NoError(t, err)
+
+	var found models.Order
+	result := db.First(&found, "id = ?", order.ID)
+	assert.Error(t, result.Error, "record should be deleted")
+}
 
 // TestDeleteOrder_Failure checks that deleting an order with an invalid ID
 // returns an error and does not affect existing records.
 func TestDeleteOrder_Failure(t *testing.T) { 
+	db, orderService, ctx := setupTestEnv(t)
+	
+	var countBefore int64
+	db.Model(&models.Order{}).Count(&countBefore)
 
- }
+	// Capture both return values and assert on the error only
+	_, err := orderService.DeleteOrder(ctx, models.DeleteOrderInput{
+		OrderID: "non-existent-id",
+		UserID: "1",
+	})
+	assert.Error(t, err, "should return error for non-existent order")
 
+	var countAfter int64
+	db.Model(&models.Order{}).Count(&countAfter)
+	assert.Equal(t, countBefore, countAfter, "no rows should be deleted")
+}
 
 //todo TestCreateOrder_ZeroQuantity: should fail validation
 
