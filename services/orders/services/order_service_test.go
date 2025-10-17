@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	 _ "github.com/lib/pq" 
 	"github.com/docker/go-connections/nat"
+	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tagaertner/e-commerce-graphql/services/orders/models"
@@ -17,6 +17,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// === SET UP ===
 // setupTestDB starts a temporary Postgres container using testcontainers-go.
 // Requires Docker to be running. The container is created automatically for tests
 // and removed after they complete, providing an isolated Postgres instance that
@@ -62,6 +63,8 @@ func setupTestEnv(t *testing.T) (*gorm.DB, *OrderService, context.Context) {
     ctx := context.Background()
 	return db, orderService, ctx
 }
+
+// === Tests ===
 
 // TestCreateOrder_Success verifies that a valid order can be created successfully
 func TestCreateOrder_Success(t *testing.T) {
@@ -212,12 +215,53 @@ func TestGetOrdersByUserID_Failure(t *testing.T) {
 // TestUpdateOrderStatus_Success verifies that the service updates an
 // existing order’s status correctly and persists the change in the database.
 func TestUpdateOrderStatus_Success(t *testing.T) { 
+	db, orderService, ctx := setupTestEnv(t)
+
+	// --- Arrange ---
+	order := models.Order{
+		ID:         "o1",
+		UserID:     "1",
+		TotalPrice: 10.00,
+		Status:     "pending",
+	}
+	require.NoError(t, db.Create(&order).Error)
+
+	// Prepare input for update
+	newStatus := "shipped"
+	input := &models.UpdateOrderInput{
+		OrderID: order.ID,
+		Status:  &newStatus, // field is *string in your model
+	}
+
+	// --- Act ---
+	updated, err := orderService.UpdateOrder(ctx, input)
+
+	// --- Assert ---
+	require.NoError(t, err)
+	require.NotNil(t, updated)
+	require.Equal(t, "shipped", updated.Status)
 }
+
 
 // TestUpdateOrderStatus_Failure ensures that attempting to update a
 // non-existent order returns an error and does not modify any data.
 func TestUpdateOrderStatus_Failure(t *testing.T) { 
+	_, orderService, ctx := setupTestEnv(t)
 
+	// --- Arrange ---
+	// Prepare an input for a non-existent order ID
+	newStatus := "shipped"
+	input := &models.UpdateOrderInput{
+		OrderID: "bad_id", // does not exist in DB
+		Status:  &newStatus,
+	}
+
+	// --- Act ---
+	updated, err := orderService.UpdateOrder(ctx, input)
+
+	// --- Assert ---
+	assert.Error(t, err, "expected an error when updating a non-existent order")
+	assert.Nil(t, updated, "expected no order returned when update fails")
  }
 
 
