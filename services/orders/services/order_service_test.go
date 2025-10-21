@@ -264,8 +264,6 @@ func TestUpdateOrderStatus_Failure(t *testing.T) {
 	assert.Nil(t, updated, "expected no order returned when update fails")
  }
 
-
-// todo Delete
 // TestDeleteOrder_Success validates that a created order can be deleted
 // and no longer exists in the test database after deletion.
 func TestDeleteOrder_Success(t *testing.T) { 
@@ -312,13 +310,108 @@ func TestDeleteOrder_Failure(t *testing.T) {
 	assert.Equal(t, countBefore, countAfter, "no rows should be deleted")
 }
 
-//todo TestCreateOrder_ZeroQuantity: should fail validation
+func TestCreateOrder_ZeroQuantity(t *testing.T){
+	_, orderService, ctx := setupTestEnv(t)
 
+	// --- Arrange ---
+	// Test zero quantity
+	created, err := orderService.CreateOrder(
+		ctx,
+		"1",
+		[]string{"101"},
+		0,
+		49.99,
+		"pending",
+		time.Now(),
+	)
+
+	// --- Assert ---
+	assert.Error(t, err, "should reject zero quantity")
+	assert.Nil(t, created, "order should not be created with zero quantity")
+
+	// Test negative quantity
+	created, err = orderService.CreateOrder(
+		ctx,
+		"1",
+		[]string{"101"},
+		-5,
+		49.99,
+		"pending",
+		time.Now(),
+)
+
+	assert.Error(t, err, "should reject negative quantity")
+	assert.Nil(t, created, "order should not be created with negative quantity")
+
+}
 // Todo TestGetOrderbyUserID_MultipleUsers: ensure only that users order return
+// TestGetOrderByUserID_MultipleUsers ensures that each user only sees
+// their own orders and cannot access other users' orders.
+func TestGetOrderByUserID_MultipleUsers(t *testing.T) {
+	db, orderService, _ := setupTestEnv(t)
 
-// Todo TestUpdateOrderStatus_NoChange: updating with same status should not error
+	// Create products
+	product1 := models.Product{
+		ID:          "p1",
+		Name:        "Widget",
+		Price:       59.99,
+		Description: "Fancy widget",
+		Inventory:   40,
+		Available:   true,
+	}
+	require.NoError(t, db.Create(&product1).Error)
 
+	// Create order for User 1
+	order1 := models.Order{
+		ID:         "o1",
+		UserID:     "user1",
+		Products:   []models.Product{product1},
+		Quantity:   1,
+		TotalPrice: 59.99,
+		Status:     "pending",
+		CreatedAt:  models.Now(),
+	}
+	require.NoError(t, db.Create(&order1).Error)
+
+	// Create order for User 2
+	order2 := models.Order{
+		ID:         "o2",
+		UserID:     "user2",
+		Products:   []models.Product{product1},
+		Quantity:   2,
+		TotalPrice: 119.98,
+		Status:     "completed",
+		CreatedAt:  models.Now(),
+	}
+	require.NoError(t, db.Create(&order2).Error)
+
+	// --- Act: Get orders for User 1 ---
+	user1Orders, err := orderService.GetOrdersByUserID("user1")
+	require.NoError(t, err)
+
+	// --- Assert: User 1 should only see their order ---
+	require.Len(t, user1Orders, 1, "user1 should only see 1 order")
+	require.Equal(t, "o1", user1Orders[0].ID)
+	require.Equal(t, "user1", user1Orders[0].UserID)
+
+	// --- Act: Get orders for User 2 ---
+	user2Orders, err := orderService.GetOrdersByUserID("user2")
+	require.NoError(t, err)
+
+	// --- Assert: User 2 should only see their order ---
+	require.Len(t, user2Orders, 1, "user2 should only see 1 order")
+	require.Equal(t, "o2", user2Orders[0].ID)
+	require.Equal(t, "user2", user2Orders[0].UserID)
+}
+
+// To	do TestUpdateOrderStatus_NoChange: updating with same status should not error
+func TestUpdateOrderStatus_NoChange (t *testing.T){
+
+}
 // Todo TestDeleteOrder_Twice : second delet should error gracefully
+func TestDeleteOrder_Twice (t *testing.T){
+
+}
 // Example GraphQL E2E tests:
 //•	✅ TestQueryOrders — queries all orders and checks response shape.
 //•	✅ TestMutationCreateOrder — hits GraphQL mutation (optional).
