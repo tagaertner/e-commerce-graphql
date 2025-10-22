@@ -406,10 +406,64 @@ func TestGetOrderByUserID_MultipleUsers(t *testing.T) {
 
 // To	do TestUpdateOrderStatus_NoChange: updating with same status should not error
 func TestUpdateOrderStatus_NoChange (t *testing.T){
+	db, orderService, ctx := setupTestEnv(t)
 
+	// --Arrange --
+	order := models.Order{
+		ID: "o1",
+		UserID: "1",
+		TotalPrice: 10.00,
+		Status: "pending",
+	}
+	require.NoError(t, db.Create(&order).Error)
+
+	// Prepare input with same status
+	sameStatus := "pending"
+	input := &models.UpdateOrderInput{
+		OrderID: order.ID,
+		Status:  &sameStatus,
+	}
+
+	// --Act --
+	updated, err := orderService.UpdateOrder(ctx, input)
+	
+	// --- Assert --
+	require.NoError(t, err, "updating with same status should not error")
+	require.NotNil(t, updated)
+	require.Equal(t, "pending", updated.Status, "status should remain unchanged")
 }
+
 // Todo TestDeleteOrder_Twice : second delet should error gracefully
 func TestDeleteOrder_Twice (t *testing.T){
+	db, orderService, ctx := setupTestEnv(t)
+
+	// -- Arrage --
+	order := models.Order{
+				ID:         "o1",
+		UserID:     "1",
+		TotalPrice: 10.00,
+		Status:     "pending",	
+	}
+	require.NoError(t, db.Create(&order).Error)
+
+	// --- Act: First deletion (should succeed) ---
+	success, err := orderService.DeleteOrder(ctx, models.DeleteOrderInput{
+		OrderID: order.ID,
+		UserID:  "1",
+	})
+	require.NoError(t, err, "first deletion should succeed")
+	require.True(t, success, "first deletion should return true")
+
+	// --- Act: Second deletion (should fail gracefully) ---
+	success, err = orderService.DeleteOrder(ctx, models.DeleteOrderInput{
+		OrderID: order.ID,
+		UserID:  "1",
+	})
+	
+	// --- Assert ---
+	assert.Error(t, err, "second deletion should return an error")
+	assert.False(t, success, "second deletion should return false")
+	assert.Contains(t, err.Error(), "not found", "error should indicate order not found")
 
 }
 // Example GraphQL E2E tests:
