@@ -2,9 +2,11 @@ package services
 
 import (
 	"context"
-	"fmt"
-	"time"
 	"errors"
+	"fmt"
+	"strings"
+	"time"
+
 	"github.com/tagaertner/e-commerce-graphql/services/products/models"
 	"gorm.io/gorm"
 )
@@ -41,6 +43,9 @@ func (s *ProductService) CreateProduct(ctx context.Context,  name string, price 
 		Description: &description,
 		Inventory: inventory,
 		Available: true,
+	}
+	if strings.TrimSpace(name) == ""{
+		return nil, fmt.Errorf("invalid product name: missing or invalid field")
 	}
 	if err := s.db.WithContext(ctx).Create(product).Error; err != nil{
 		return nil, err
