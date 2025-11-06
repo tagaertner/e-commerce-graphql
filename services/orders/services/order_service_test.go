@@ -211,7 +211,6 @@ func TestGetOrdersByUserID_Failure(t *testing.T) {
 	require.Len(t, orders, 0, "expected no orders for this user")
 }
 
-//todo update
 // TestUpdateOrderStatus_Success verifies that the service updates an
 // existing order’s status correctly and persists the change in the database.
 func TestUpdateOrderStatus_Success(t *testing.T) { 

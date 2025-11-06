@@ -79,7 +79,7 @@ func TestCreateProduct_Success(t *testing.T){
 	assert.Equal(t, float64(29.99), created.Price)
 }
 
-// TestCreateProduct_Failure
+// TestCreateProduct_Failure verifies that inventory is updated
 func TestCreateProduct_Failure(t *testing.T) {
 	_, productService, ctx := setupTestEnv(t)
 	desc := "Simple widget"
@@ -93,13 +93,54 @@ func TestCreateProduct_Failure(t *testing.T) {
 	assert.EqualError(t, err, "invalid product name: missing or invalid field")
 	assert.Nil(t, created, "Product should not be created")
 }
-	//•	Missing name or negative price should return a clear error (e.g. "invalid product input: missing or invalid fields").
 
-// 	TestUpdateProduct_Success
-	//•	Creates product, updates one field (price or inventory), checks persisted change.
+// 	TestUpdateProduct_Success update inventory to 8
+func TestUpdateProduct_Success(t *testing.T){
+	db, productService, ctx := setupTestEnv(t)
 
-//TestUpdateProduct_Failure
-	//•	Update non-existent ID should error.
+	// ---Arrange ---
+	productDesc := "New Widget"
+	product := models.Product{
+		Name: "Widgets",
+		Price: 4.99,
+		Description: &productDesc,
+		Inventory: 10,
+	}
+	require.NoError(t, db.Create(&product).Error)
+
+	// Prepare input for update
+	newInventory := 8
+	updateInput := &models.UpdateProductInput{
+		Inventory: &newInventory,
+	}
+
+	// ---Act---
+	updated, err := productService.UpdateProduct(ctx, product.ID, *updateInput)
+
+	// ---Assert---
+	require.NoError(t, err)
+	require.NotNil(t, updated)
+	assert.Equal(t, newInventory, updated.Inventory)
+}
+
+
+//TestUpdateProduct_Failure Update non-existent ID should error.
+func TestUpdateProduct_Failure(t *testing.T){
+	_, productService, ctx := setupTestEnv(t)
+
+	// ---Arrange ---
+	newName := " Update Widget"
+	updateInput := &models.UpdateProductInput{
+		Name: &newName,
+	}
+
+	// ---Act---
+	updated, err := productService.UpdateProduct(ctx, "non-existent-id", *updateInput)
+
+	// ---Assert ---
+	assert.Error(t, err, "expected error when updating non-existent product")
+	assert.Nil(t, updated, "no product should be returned on failure")
+}
 
 //TestDeleteProduct_Success
 	//•	Creates product, deletes it, then verifies it no longer exists.

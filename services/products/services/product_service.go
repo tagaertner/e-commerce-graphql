@@ -56,7 +56,7 @@ func (s *ProductService) CreateProduct(ctx context.Context,  name string, price 
 func (s *ProductService)UpdateProduct(ctx context.Context, id string,  input models.UpdateProductInput) (*models.Product, error){
 	product := &models.Product{ID: id}
 
-	updates := s.db.WithContext(ctx).Model(&product)
+	updates := s.db.WithContext(ctx).Model(&models.Product{}).Where("id = ?", id)
 
 	if input.Name != nil{
 		updates = updates.Update("name", *input.Name)
