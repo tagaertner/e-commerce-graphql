@@ -64,6 +64,11 @@ func setupTestEnv(t *testing.T) (*gorm.DB, *ProductService, context.Context) {
 	return db, productService, ctx
 }
 
+// Helper function for string literals
+func strPtr(s string) *string {
+    return &s
+}
+
 // === Tests ===
 
 // TestCreateProduct_Success verifies that a product with valid name, price, inventory, and description
@@ -142,11 +147,49 @@ func TestUpdateProduct_Failure(t *testing.T){
 	assert.Nil(t, updated, "no product should be returned on failure")
 }
 
-//TestDeleteProduct_Success
-	//•	Creates product, deletes it, then verifies it no longer exists.
+//TestDeleteProduct_Success Creates product, deletes it, then verifies it no longer exists.
+func TestDeleteProduct_Success (t *testing.T){
+	db, productService, ctx := setupTestEnv(t)
 
-//TestDeleteProduct_Failure
-	//•	Delete with bad ID returns error, no rows affected.
+	// ---Arrange --- ID, Name
+	product := models.Product{
+		ID: "ab23",
+		Name: "Old Widget",
+	}
+	
+	require.NoError(t, db.Create(&product).Error)
+
+	_, err := productService.DeleteProduct(ctx, models.DeleteProductInput{
+		ID: &product.ID,
+		Name: strPtr("Old Widget"),
+	})
+	require.NoError(t, err)
+
+	var found models.Product
+	result := db.First(&found, "id =?", product.ID)
+	assert.Error(t, result.Error, "product should be deleted")
+
+}
+
+//TestDeleteProduct_Failure Delete with bad ID returns error, no rows affected.
+func TestDeleteProduct_Failure(t *testing.T){
+	db, productServices, ctx := setupTestEnv(t)
+
+	var countBefore int64
+	db.Model(&models.Product{}).Count(&countBefore)
+
+	// Capture both return values and assert on the error only
+	_, err := productServices.DeleteProduct(ctx, models.DeleteProductInput{
+		ID: strPtr("non-existent-id"),
+		Name: strPtr("Old Widget"),
+	})
+	assert.Error(t, err, "should return error for non-existant id")
+
+	var countAfter int64
+	db.Model(&models.Product{}).Count(&countAfter)
+	assert.Equal(t, countBefore, countAfter, "no rows should be deleted")
+
+}
 
 // Validation/Edge Case 
 

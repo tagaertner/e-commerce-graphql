@@ -92,16 +92,16 @@ func (s *ProductService)DeleteProduct(ctx context.Context, input models.DeletePr
 	}
 
 	if input.ID != nil {
-		result = s.db.WithContext(ctx).Delete(&models.Product{}, "id = ?", input.ID)
+		result = s.db.WithContext(ctx).Delete(&models.Product{}, "id = ?", *input.ID)
 	} else if input.Name != nil {
-		result = s.db.WithContext(ctx).Delete(&models.Product{}, "name = ?", input.Name)
+		result = s.db.WithContext(ctx).Delete(&models.Product{}, "name = ?", *input.Name)
 	}
 
 	if result.Error != nil {
 		return false, result.Error
 	}
 	if result.RowsAffected == 0 {
-		return false, nil
+		return false, fmt.Errorf("product not found")
 	}
 	return true, nil
 }
