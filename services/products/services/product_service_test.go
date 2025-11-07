@@ -191,7 +191,6 @@ func TestDeleteProduct_Failure(t *testing.T){
 
 }
 
-
 // TestCreateProduct_ZeroOrNegativeInventory Reject inventory < 0.
 func TestCreateProduct_ZeroOrNegativeInventory(t *testing.T){
 	_, productService, ctx := setupTestEnv(t)
@@ -303,8 +302,169 @@ func TestGetAllProducts_Success(t *testing.T){
 	assert.Contains(t, names, "Gadget")
 	assert.Contains(t, names, "Widgy Gadget")
 }
-// todo TestGetProductByID_Success Valid ID returns correct product.
+// TestGetProductByID_Success Valid ID returns correct product.
+func TestGetProductByID_Success(t *testing.T){
+	db, productService, _ := setupTestEnv(t)
+		// Create some products
+	product1 := models.Product {
+		
+		ID:		"p1",
+		Name:  	"Widget",
+		Price: 	59.99,
+		Description: strPtr("Fancy widget"),
+		Inventory: 40,
+		Available: true,
+	}
 
-// todo TestGetProductByID_Failure	Invalid ID returns nil and error.
+	product2 := models.Product {
+		ID:		"p2",
+		Name:  	"Gadget",
+		Price: 	38.99,
+		Description: strPtr("Plain gadget"),
+		Inventory: 51,
+		Available: true,
+	}
 
+		product3 := models.Product {
+		ID:		"p3",
+		Name:  	"Thingamajig",
+		Price: 	19.99,
+		Description: strPtr("Fancy smancy gadget"),
+		Inventory: 30,
+		Available: true,
+	}
+	require.NoError(t, db.Create(&product1).Error)
+	require.NoError(t, db.Create(&product2).Error)
+	require.NoError(t, db.Create(&product3).Error)
+
+	// ---Act ---
+	products, err :=productService.GetProductByID("p3")
+
+	// ---Assert ---
+	require.NoError(t, err)
+	require.NotNil(t, products)
+	assert.Equal(t, "p3", product3.ID)
+	assert.Equal(t, "Thingamajig", product3.Name)
+	assert.Equal(t, 19.99, product3.Price)
 	
+}
+
+// TestGetProductByID_FailureInvalid ID returns nil and error.
+func TestGetProductByID_Failure (t *testing.T){
+	_, productService, _ := setupTestEnv(t)
+
+	// ---Arrange ---
+	// No products created for this
+
+	// ---Act ---
+	products, err := productService.GetProductByID("p2")
+
+	// ---Assert---
+	require.Error(t, err, "expected error when querying non-existent product")
+	require.Nil(t, products, "expected nil product for non-existent ID")
+	
+}
+
+//TestRestockProduct_Success 
+func TestRestockProduct_Success(t *testing.T){
+	db, productServices, ctx := setupTestEnv(t)
+
+	// ---Arrange ---
+	product := models.Product{
+		ID:  "p1",
+		Name: "Widget",
+		Price: 9.99,
+		Description: strPtr("Simple widget"),
+		Inventory: 5,
+		Available: true,
+	}
+	require.NoError(t, db.Create(&product).Error)
+
+	// ---Act ---
+	updated, err := productServices.RestockProduct(ctx, "p1", 10)
+
+	// ---Assert ---
+	require.NoError(t, err)
+	assert.Equal(t, 15, updated.Inventory)
+}
+
+// TestRestockProduct_Failure
+func TestRestockProduct_Failure(t *testing.T){
+	_, productService, ctx := setupTestEnv(t)
+
+	//---Act---
+	product, err := productService.RestockProduct(ctx, "non-existent-id", 10)
+
+	// ----Assert ---
+	assert.Error(t, err, "should return error when restocking non-existent product")
+	assert.Nil(t, product, "no product should be returned on failure")
+
+}
+
+// TestRestockProduct_Failure_NegativeAmount reject negative amount
+func TestRestockProduct_Failure_NegativeAmount(t *testing.T){
+	db, productService, ctx := setupTestEnv(t)
+
+	product := models.Product {
+		ID:		"p3",
+		Name:  	"Thingamajig",
+		Price: 	19.99,
+		Description: strPtr("Fancy smancy gadget"),
+		Inventory: 30,
+		Available: true,
+	}
+	require.NoError(t, db.Create(&product).Error)
+
+	updated, err := productService.RestockProduct(ctx, "p3", -10)
+
+	// ---Assert---
+	assert.Error(t, err, "should reject negative restock amount")
+	assert.Nil(t, updated)
+	
+}
+
+//TestSetProductAvailability
+func TestSetProductAvailability_Success(t *testing.T){
+	db, productService, ctx := setupTestEnv(t)
+
+	product := models.Product{
+		ID:          "p2",
+		Name:        "Gadget",
+		Price:       19.99,
+		Description: strPtr("Basic gadget"),
+		Inventory:   12,
+		Available:   true,
+	}
+	require.NoError(t, db.Create(&product).Error)
+
+	// ---Act ---
+	updated , err := productService.SetProductAvailability(ctx, "p2", false)
+
+	// --Assert --
+	require.NoError(t, err)
+	assert.False(t, updated.Available)
+}
+
+// Todo TestSetProductAvailability_Failure
+func TestSetProductAvailability_Failure(t *testing.T){
+	_, productService, ctx := setupTestEnv(t)
+
+	// ---Act ---
+	product, err := productService.SetProductAvailability(ctx, "non-existent-id", false)
+
+	// ---Assert ---
+	assert.Error(t, err, "should return error when toggling non-existent product")
+	assert.Nil(t, product)
+}
+
+// TestSetProductAvailability_Failure_NotFound
+func TestSetProductAvailability_Failure_NotFound(t *testing.T){
+	_,productService, ctx := setupTestEnv(t)
+
+	// ---Act ---
+	product, err := productService.SetProductAvailability(ctx, "non-existent-id", false)
+
+	// --- Assert ---
+	assert.Error(t, err, "should return error when product does not exist")
+	assert.Nil(t, product, "expected nil product on failure")
+}

@@ -123,9 +123,14 @@ func (s *ProductService)RestockProduct(ctx context.Context, id string, quantity 
 		return nil, err
 	}
 
+	// Validate the restock amount
+	if quantity <= 0 {
+		return nil, fmt.Errorf("invalid restock amount: must be greater than zero")
+	}
 	// Update inventory
 	product.Inventory += quantity
 
+	// Save updated product
 	if err := s.db.WithContext(ctx).Save(&product).Error; err != nil {
 		return nil, err
 	}
@@ -134,10 +139,24 @@ func (s *ProductService)RestockProduct(ctx context.Context, id string, quantity 
 
 func (s *ProductService)SetProductAvailability(ctx context.Context, id string, available bool) (*models.Product, error){
 	var product models.Product
+
+	// Fetch product
 	if err := s.db.WithContext(ctx).First(&product, "id = ?", id).Error; err != nil{
 		return nil, err
 	}
 
+	// Prevent redundate updates
+	if product.Available == available {
+		return &product, fmt.Errorf("product already availability set to %t", available)
+
+	}
+
+	// safegard
+	if available && product.Inventory <= 0{
+		return nil, fmt.Errorf("cannot mark product as available with zero inventory")
+	}
+
+	// Udate availability
 	product.Available = available
 
 	if err := s.db.WithContext(ctx).Save(&product).Error; err != nil{
