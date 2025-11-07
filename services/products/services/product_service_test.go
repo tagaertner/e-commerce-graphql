@@ -191,29 +191,120 @@ func TestDeleteProduct_Failure(t *testing.T){
 
 }
 
-// Validation/Edge Case 
 
-// TestCreateProduct_ZeroOrNegativeInventory
-	// Reject inventory < 0.
+// TestCreateProduct_ZeroOrNegativeInventory Reject inventory < 0.
+func TestCreateProduct_ZeroOrNegativeInventory(t *testing.T){
+	_, productService, ctx := setupTestEnv(t)
 
-// TestCreateProduct_ZeroPrice
-  //Reject products with price 0.
+	// ---Arrange --- name, price, description, inventory
+	created, err := productService.CreateProduct(
+		ctx,
+		"Zero Widget",
+		51.99,
+		"Something invisable but awesome",
+		0,
+		
+	)
 
-// TestUpdateProduct_NoChange
-	//Updating with same values should not error or mutate timestamps.
+	// ---Assert---
+	assert.Error(t, err, "should reject zero inventory")
+	assert.Nil(t, created, "product should not be created with zero inventory")
 
-// TestDeleteProduct_Twice
-	// First delete succeeds; second delete returns “not found”.
+	// Test negative inventory
+	created, err = productService.CreateProduct(
+		ctx,
+		"Nil Widget",
+		 29.99,
+		"Not so awesome",
+		-5,
+	
+	)
 
+	assert.Error(t, err, "should reject negative inventory")
+	assert.Nil(t, created, "product should not be created with negative inventory")
+}
 
-// QUERY TESTS
-//TestGetAllProducts_Success
-	//•	Insert multiple products, call GetAllProducts(), verify correct count + order.
+// TestDeleteProduct_Twice First delete succeeds; second delete returns “not found”. id and name
+func TestDeleteProduct_Twice (t *testing.T){
+	db, productService, ctx := setupTestEnv(t)
 
-//TestGetProductByID_Success
-	//•	Valid ID returns correct product.
+	// ---Arrange --
+	product := models.Product{
+		ID: "p2",
+		Name: "Gadget",
+	}
+	require.NoError(t, db.Create(&product).Error)
 
-//TestGetProductByID_Failure
-	//•	Invalid ID returns nil and error.
+	// ---Act: First dlection should succeed ---
+	success, err := productService.DeleteProduct(ctx, models.DeleteProductInput{
+		ID: &product.ID,
+		Name: strPtr("Gadget"),
+	})
+	require.NoError(t, err, "first deletion should succeed")
+	require.True(t, success, "first deletion should return true")
+
+	// ---Act: Second deletion should fail gracefully ---
+	success, err = productService.DeleteProduct(ctx, models.DeleteProductInput{
+		ID: &product.ID,
+		Name: strPtr("Gadget"),
+	})
+
+	// ---Assert ---
+	assert.Error(t, err, "second deletion should return an error")
+	assert.False(t, success, "second deletion should return false")
+	assert.Contains(t, err.Error(), "not found", "error shoul dindicate product not found")
+}
+
+//TestGetAllProducts_Success Insert multiple products, call GetAllProducts(), verify correct count + order.
+func TestGetAllProducts_Success(t *testing.T){
+	db, productService, _ := setupTestEnv(t)
+		// Create some products
+	product1 := models.Product {
+		
+		ID:		"p1",
+		Name:  	"Widget",
+		Price: 	59.99,
+		Description: strPtr("Fancy widget"),
+		Inventory: 40,
+		Available: true,
+	}
+
+	product2 := models.Product {
+		ID:		"p2",
+		Name:  	"Gadget",
+		Price: 	38.99,
+		Description: strPtr("Plain gadget"),
+		Inventory: 51,
+		Available: true,
+	}
+
+		product3 := models.Product {
+		ID:		"p3",
+		Name:  	"Widgy Gadget",
+		Price: 	55.99,
+		Description: strPtr("Fancy smancy gadget"),
+		Inventory: 30,
+		Available: true,
+	}
+	require.NoError(t, db.Create(&product1).Error)
+	require.NoError(t,db.Create(&product2).Error)
+	require.NoError(t,db.Create(&product3).Error)
+	
+	// ---Act ---
+	products, err :=productService.GetAllProducts()
+
+	// -- Assert ---
+	require.NoError(t, err)
+	require.Len(t, products, 3, "should return all inserted products")
+
+	// Verfiy all 3 names exits
+	names := []string{products[0].Name, products[1].Name, products[2].Name}
+	assert.Contains(t, names, "Widget")
+	assert.Contains(t, names, "Gadget")
+	assert.Contains(t, names, "Widgy Gadget")
+}
+// todo TestGetProductByID_Success Valid ID returns correct product.
+
+// todo TestGetProductByID_Failure	Invalid ID returns nil and error.
 
 	

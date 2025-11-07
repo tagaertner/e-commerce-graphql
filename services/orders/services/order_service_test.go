@@ -343,7 +343,7 @@ func TestCreateOrder_ZeroQuantity(t *testing.T){
 	assert.Nil(t, created, "order should not be created with negative quantity")
 
 }
-// Todo TestGetOrderbyUserID_MultipleUsers: ensure only that users order return
+
 // TestGetOrderByUserID_MultipleUsers ensures that each user only sees
 // their own orders and cannot access other users' orders.
 func TestGetOrderByUserID_MultipleUsers(t *testing.T) {
@@ -432,13 +432,12 @@ func TestUpdateOrderStatus_NoChange (t *testing.T){
 	require.Equal(t, "pending", updated.Status, "status should remain unchanged")
 }
 
-// Todo TestDeleteOrder_Twice : second delet should error gracefully
 func TestDeleteOrder_Twice (t *testing.T){
 	db, orderService, ctx := setupTestEnv(t)
 
 	// -- Arrage --
 	order := models.Order{
-				ID:         "o1",
+		ID:         "o1",
 		UserID:     "1",
 		TotalPrice: 10.00,
 		Status:     "pending",	

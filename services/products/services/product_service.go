@@ -36,6 +36,17 @@ func (s *ProductService) GetProductByID(id string) (*models.Product, error) {
 }
 
 func (s *ProductService) CreateProduct(ctx context.Context,  name string, price float64, description string, inventory int ) (*models.Product, error){
+
+	if strings.TrimSpace(name) == ""{
+		return nil, fmt.Errorf("invalid product name: missing or invalid field")
+	}
+	if price <= 0 {
+		return nil, fmt.Errorf("invalid product name: missing or invalid field")
+	}
+	if inventory <= 0 {
+		return nil, fmt.Errorf("invalid product inventory: must be greater than zero")
+	}
+
 	product := &models.Product{
 		ID:   fmt.Sprintf("product_%d", time.Now().UnixNano()),
 		Name: name,
@@ -44,9 +55,7 @@ func (s *ProductService) CreateProduct(ctx context.Context,  name string, price 
 		Inventory: inventory,
 		Available: true,
 	}
-	if strings.TrimSpace(name) == ""{
-		return nil, fmt.Errorf("invalid product name: missing or invalid field")
-	}
+	
 	if err := s.db.WithContext(ctx).Create(product).Error; err != nil{
 		return nil, err
 	}
