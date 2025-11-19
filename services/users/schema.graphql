@@ -22,19 +22,15 @@ input CreateUserInput {
 }
 
 input UpdateUserInput {
+  id: ID!
   name: String
   email: String
   role: String
   active: Boolean
 }
 
-input DeleteUserInput {
-  id: ID
-  name: String
-}
-
 type Mutation {
   createUser(input: CreateUserInput!): User!
   updateUser(id: ID!, input: UpdateUserInput!): User!
-  deleteUser(input: DeleteUserInput!): Boolean!
+  deleteUser(id: ID!): Boolean!
 }

@@ -64,6 +64,15 @@ func setupTestEnv(t *testing.T) (*gorm.DB, *UserService, context.Context) {
 	return db, userService, ctx
 }
 
+// Helper Function 
+func BoolPointer(b bool) *bool{
+	return &b
+}
+
+func StringPointer(s string) *string {
+	return &s
+}
+
 // === Tests ===
 
 // 🧪 GetUserByID
@@ -173,15 +182,114 @@ func TestGetAllUsers_ReturnsEmptySlice_WhenNoUsersExist(t *testing.T){
 
 
 // 🧪 CreateUser
-// 	5.	TestCreateUser_SuccessfullyCreatesUser
+// TestCreateUser_Success
+func TestCreateUser_Success(t *testing.T){
+	_, userSevice, ctx := setupTestEnv(t)
+
+	created, err := userSevice.CreateUser(
+		ctx,
+		"user1",
+		"1user@test.com",
+	)
+	
+	assert.NoError(t, err)
+	assert.NotEmpty(t, created)
+
+	assert.NotEmpty(t, created.ID, "Id should be auto-generated")
+	assert.Equal(t, "user1", created.Name, "Name should match input")
+	assert.Equal(t, "1user@test.com", created.Email, "Email should match input")
+
+	assert.Equal(t, "user",created.Role, "Default role should be 'user'")
+	assert.True(t, created.Active, "User should be active by default")
+
+}
 // 	6.	TestCreateUser_ReturnsError_WhenDatabaseFails
+func TestCreateUser_ReturnsError_WhenDatabaseFails(t *testing.T){
+	_, userService, ctx := setupTestEnv(t)
+
+	created, err := userService.CreateUser(
+	
+		ctx,
+		" ",
+		"3user@test.com",
+	)
+	assert.Error(t, err, "invalid database")
+	assert.Nil(t, created, "user should not be created when userID or user name is invalid")
+}
 // 	7.	TestCreateUser_SetsDefaultRoleAndActiveFields
+func TestCreateUser_SetsDefaultRoleAndActiveFields(t *testing.T){
 
+}
+func TestUpdateUser_UpdatesProvidedFields(t *testing.T){
+	db, userService, ctx := setupTestEnv(t)
 
+	// ---Arrange ---
+	user := models.User{
+		ID: "o1",
+		Name: "Nancy Drew",
+		Email: "nancyTest@email.com",
+		Role: "customer",
+		Active: true,
+	}
+	require.NoError(t, db.Create(&user).Error)
 
-// 🧪 UpdateUser
-// 	8.	TestUpdateUser_UpdatesProvidedFields
+	// prepare for input update
+	// newEmail := "nancy2Test@email.com "
+	
+	
+	// ---Act ---
+	input := &models.UpdateUserInput{
+		ID:    "o1",
+		Email: StringPointer("nancy2Test@email.com "),
+	}
+
+	update, err := userService.UpdateUser(ctx, input)
+
+	// ---Assert ---
+	require.NoError(t, err)
+	require.NotNil(t, update)
+	require.Equal(t, "nancy2Test@email.com ", update.Email)
+}
 // 	9.	TestUpdateUser_DoesNotUpdateWhenNoFieldsProvided
+func TestUpdateUser_DoesNotUpdateWhenNoFieldsProvided (t *testing.T){
+	db, userService, ctx:= setupTestEnv(t)
+
+	// --Arrange ---
+	original := models.User{
+		ID: "123",
+    	Name: "John",
+    	Email: "john@test.com",
+   		Role: "user",
+    	Active: true,
+	}
+	require.NoError(t, db.Create(&original).Error)
+
+	// Prepare empty update (no fields set)
+	input := &models.UpdateUserInput{
+		ID: "123", // only ID provided
+		// Name: nil
+		// Email: nil
+		// Role: nil
+		// Active: nil
+	}
+
+	//---Act ---
+	updated, err := userService.UpdateUser(ctx, input)
+	require.NoError(t, err, "expected no error when quering non-existaent user")
+	require.NoError(t, err, "no error should occur for empty updates")
+	require.NotNil(t, updated)
+
+	// --- Assert ---
+	// Pull from DB to be absolutely sure nothing changed
+	var fetched models.User
+	require.NoError(t, db.First(&fetched, "id = ?", "123").Error)
+
+	assert.Equal(t, original.Name, fetched.Name)
+	assert.Equal(t, original.Email, fetched.Email)
+	assert.Equal(t, original.Role, fetched.Role)
+	assert.Equal(t, original.Active, fetched.Active)
+
+}
 // 	10.	TestUpdateUser_ReturnsError_WhenUserDoesNotExist
 // 	11.	TestUpdateUser_PartiallyUpdatesFieldsSuccessfully
 

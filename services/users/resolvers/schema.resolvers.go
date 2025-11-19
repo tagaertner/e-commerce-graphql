@@ -18,12 +18,12 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input models.CreateUs
 
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input models.UpdateUserInput) (*models.User, error) {
-	return r.UserService.UpdateUser(ctx, id, input.Name, input.Email, input.Role, input.Active)
+	return r.UserService.UpdateUser(ctx, &input)
 }
 
 // DeleteUser is the resolver for the deleteUser field.
-func (r *mutationResolver) DeleteUser(ctx context.Context, input models.DeleteUserInput) (bool, error) {
-	return r.UserService.DeleteUser(ctx, input)
+func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, error) {
+	return r.UserService.DeleteUser(ctx, id)
 }
 
 // Users is the resolver for the users field.
@@ -43,8 +43,6 @@ func (r *queryResolver) User(ctx context.Context, id string) (*models.User, erro
 	}
 	return user, nil
 }
-
-
 
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
