@@ -218,7 +218,7 @@ func TestCreateUser_ReturnsError_WhenDatabaseFails(t *testing.T){
 }
 // 	7.	TestCreateUser_SetsDefaultRoleAndActiveFields
 func TestCreateUser_SetsDefaultRoleAndActiveFields(t *testing.T){
-
+ //TOdo
 }
 func TestUpdateUser_UpdatesProvidedFields(t *testing.T){
 	db, userService, ctx := setupTestEnv(t)
