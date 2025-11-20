@@ -291,6 +291,9 @@ func TestUpdateUser_DoesNotUpdateWhenNoFieldsProvided (t *testing.T){
 
 }
 // 	10.	TestUpdateUser_ReturnsError_WhenUserDoesNotExist
+func TestUpdateUser_ReturnsError_WhenUserDoesNotExist (t *testing.T){
+	
+}
 // 	11.	TestUpdateUser_PartiallyUpdatesFieldsSuccessfully
 
 
