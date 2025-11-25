@@ -1,0 +1,8 @@
+gradio
+openai
+anthropic
+python-dotenv
+requests
+strawberry-graphql
+fastapi
+uvicorn

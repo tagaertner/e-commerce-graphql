@@ -98,6 +98,8 @@ services:
       retries: 3
       start_period: 40s
 
+  # Todo Gradio Frontend Service (Python)
+
   # Seed runs after services create tables
   db-seed:
     image: postgres:16
