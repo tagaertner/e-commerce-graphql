@@ -229,7 +229,7 @@ func TestUpdateOrderStatus_Success(t *testing.T) {
 	newStatus := "shipped"
 	input := &models.UpdateOrderInput{
 		OrderID: order.ID,
-		Status:  &newStatus, // field is *string in your model
+		Status:  &newStatus, 
 	}
 
 	// --- Act ---

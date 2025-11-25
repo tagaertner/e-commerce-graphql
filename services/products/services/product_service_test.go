@@ -445,7 +445,6 @@ func TestSetProductAvailability_Success(t *testing.T){
 	assert.False(t, updated.Available)
 }
 
-// Todo TestSetProductAvailability_Failure
 func TestSetProductAvailability_Failure(t *testing.T){
 	_, productService, ctx := setupTestEnv(t)
 
