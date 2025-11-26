@@ -1,78 +1,99 @@
 """
 handlers.py
-Outline for transforming UI inputs → GraphQL client calls.
+Transform UI inputs → GraphQL client calls.
 """
 
 from graphql_client import (
+    # User client functions
     create_user, get_users, get_user_by_id, update_user, delete_user,
-    add_product, get_products, get_product_by_id, update_product, delete_product,
-    create_order, get_orders, get_orders_for_user, get_order_by_id, update_order, delete_order
+
+    # Product client functions
+    get_products, get_product_by_id, create_product, update_product, delete_product,
+    restock_product, set_product_availability,
+
+    # Order client functions
+    create_order, get_orders, get_orders_for_user, get_order_by_id,
+    update_order, delete_order, set_order_status, change_order_quantity
 )
 
 """
 ===========================
- USER HANDLERS
+ USER HANDLERS (Admin + Customer)
 ===========================
 """
 
-def handle_create_user(name, email):
+def create_user(name, email):
     pass
 
-def handle_list_users():
+def list_users():
+    pass  # ADMIN
+
+def get_user(user_id):
+    pass  # ADMIN
+
+def update_user(user_id, name, email):
     pass
 
-def handle_get_user(user_id):
+def delete_user(user_id):
     pass
 
-def handle_update_user(user_id, name, email):
-    pass
-
-def handle_delete_user(user_id):
-    pass
-
-
-"""
-===========================
- PRODUCT HANDLERS
-===========================
-"""
-
-def handle_add_product(name, price, description):
-    pass
-
-def handle_list_products():
-    pass
-
-def handle_get_product(product_id):
-    pass
-
-def handle_update_product(product_id, name, price, description):
-    pass
-
-def handle_delete_product(product_id):
-    pass
 
 
 """
 ===========================
- ORDER HANDLERS
+ PRODUCT HANDLERS (Admin + Customer)
 ===========================
 """
 
-def handle_create_order(user_id, product_id, quantity):
-    pass
+def add_product(name, price, description, inventory):
+    pass  # ADMIN
 
-def handle_list_orders():
-    pass
+def list_products():
+    pass  # CUSTOMER
 
-def handle_list_orders_for_user(user_id):
-    pass
+def get_product(product_id):
+    pass  # CUSTOMER
 
-def handle_get_order(order_id):
-    pass
+def update_product(product_id, name, price, description, inventory):
+    pass  # ADMIN
 
-def handle_update_order(order_id, quantity):
-    pass
+def delete_product(product_id):
+    pass  # ADMIN
 
-def handle_delete_order(order_id):
-    pass
+def restock_product(product_id, quantity):
+    pass  # ADMIN
+
+def set_product_availability(product_id, available):
+    pass  # ADMIN
+
+
+
+"""
+===========================
+ ORDER HANDLERS (Admin + Customer)
+===========================
+"""
+
+def create_order(user_id, product_ids, quantity, total_price):
+    pass  # CUSTOMER
+
+def list_orders():
+    pass  # ADMIN
+
+def list_orders_for_user(user_id):
+    pass  # CUSTOMER
+
+def get_order(order_id):
+    pass  # ADMIN
+
+def update_order(order_id, quantity=None, total_price=None, status=None):
+    pass  # ADMIN
+
+def delete_order(order_id, user_id):
+    pass  # ADMIN
+
+def set_order_status(order_id, status):
+    pass  # ADMIN
+
+def change_order_quantity(order_id, quantity):
+    pass  # ADMIN

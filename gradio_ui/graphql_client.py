@@ -3,15 +3,28 @@ import os
 
 GQL_ENDPOINT = os.getenv("GRAPHQL_ENDPOINT", "http://gateway:4000/graphql")
 
-"""
-graphql_client.py
-Outline for e-commerce GraphQL operations.
-"""
+def gql_request(query, variables=None):
+    try:
+        response = requests.post(
+            GQL_ENDPOINT,
+            json={"query": query, "variables": variables or {}},
+            headers={"Content-Type": "application/json"}
+        )
+        response.raise_for_status()
+        data = response.json()
+
+        if "errors" in data:
+            return {"error": data["errors"][0]["message"]}
+
+        return data["data"]
+
+    except Exception as e:
+        return {"error": f"❌ GraphQL request failed: {e}"}
 
 """
-===========================
+====================================
  USERS
-===========================
+====================================
 """
 
 def create_user(input_data):
@@ -26,89 +39,186 @@ def create_user(input_data):
         }
     }
     """
-    try:
-        response = requests.post(
-            GQL_ENDPOINT,
-            json={"query": mutation, "variables": {"input": input_data}},
-            headers={"Content-Type": "application/json"}
-        )
-        response.raise_for_status()
-        data = response.json()
-
-        if "errors" in data:
-            return {"error": data["errors"][0]["message"]}
-
-        return data["data"]
-
-    except Exception as e:
-        return {"error": f"❌ Failed to submit user: {e}"}
+    return gql_request(mutation, {"input": input_data})
 
 
+# Admin-only (stub)
 def get_users():
-    query = """
-    query {
-        users {
+    pass
+
+
+# Admin-only (stub)
+def get_user_by_id(user_id):
+    pass
+
+
+def update_user(input_data):
+    mutation = """
+    mutation UpdateUser($input: UpdateUserInput!){
+        updatedUser(input: $input){
             id
             name
             email
         }
     }
     """
-    pass
+    return gql_request(mutation, {"input": input_data})
 
-
-def get_user_by_id(user_id):
-    pass
-
-def update_user(input_data):
-    pass
 
 def delete_user(user_id):
-    pass
+    mutation = """
+    mutation DeleteUser($id: ID!){
+        deleteUser(id: $id)
+    }
+    """
+    return gql_request(mutation, {"input": user_id})
 
 
 """
-===========================
- PRODUCTS
-===========================
+====================================
+ PRODUCTS 
+====================================
 """
 
-def add_product(input_data):
-    pass
+# Customer
+def get_products(limit=10, offset=0, search=None):
+    query = """
+    query GetProducts($limit: Int, $offset: Int, $search: String) {
+        products(limit: $limit, offset: $offset, search: $search) {
+            id
+            name
+            price
+            description
+            inventory
+            available
+        }
+    }
+    """
 
-def get_products():
-    pass
+    variables = {
+        "limit": limit,
+        "offset": offset,
+        "search": search
+    }
 
+    return gql_request(query, variables)
+
+
+# Customer
 def get_product_by_id(product_id):
+    query = """
+    query GetProduct($id ID!){
+        product(id: $id){
+            id
+            name
+            price
+            description
+            inventory
+            available
+        }
+    }
+    """
+    return gql_request(query, {"id":product_id})
+
+
+# Admin-only
+def create_product(input_data):
     pass
 
-def update_product(input_data):
+
+# Admin-only
+def update_product(product_id, input_data):
     pass
 
-def delete_product(product_id):
+
+# Admin-only
+def delete_product(input_data):
+    pass
+
+
+# Admin-only
+def restock_product(product_id, quantity):
+    pass
+
+
+# Admin-only
+def set_product_availability(product_id, available):
     pass
 
 
 """
-===========================
- ORDERS
-===========================
+====================================
+ ORDERS 
+====================================
 """
 
+# Customer
 def create_order(input_data):
-    pass
+    mutation = """
+    mutation CreateOrder($input: CreateOrderInput!) {
+        createOrder(input: $input){
+            userId
+            quantity
+            totalPrice
+            status
+            createdAt
+            products {
+                id
+                name
+            }
+        }
+    }
+    
+    """ 
+    return gql_request(mutation, {"input": input_data})
 
+
+# Customer
+def get_orders_for_user(user_id):
+    query = """
+    query GetOrdersForUser($id: ID!) {
+        ordersByUser(userId: $id) {
+            id
+            userId
+            quantity
+            totalPrice
+            status
+            createdAt
+            products {
+                id
+                name
+            }
+        }
+    }
+    """
+    return gql_request(query, {"id": user_id})
+
+
+# Admin-only
 def get_orders():
     pass
 
-def get_orders_for_user(user_id):
-    pass
 
+# Admin-only
 def get_order_by_id(order_id):
     pass
 
+
+# Admin-only
 def update_order(input_data):
     pass
 
-def delete_order(order_id):
+
+# Admin-only
+def delete_order(input_data):
+    pass
+
+
+# Admin-only
+def set_order_status(order_id, status):
+    pass
+
+
+# Admin-only
+def change_order_quantity(order_id, quantity):
     pass
