@@ -14,7 +14,7 @@ RUN go mod download
 
 COPY . .
 
-RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o server ./services/products && chmod +x server
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o server . && chmod +x server
 
 FROM --platform=$TARGETPLATFORM alpine:latest
 

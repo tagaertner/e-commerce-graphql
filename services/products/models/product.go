@@ -30,5 +30,15 @@ type DeleteProductInput struct {
 	Name *string `json:"name"`
 }
 
+type RestockProductInput struct {
+    ID       string `json:"id"`
+    Quantity int    `json:"quantity"`
+}
+
+type SetProductAvailabilityInput struct {
+    ID        string `json:"id"`
+    Available bool   `json:"available"`
+}
+
 
 func (Product) IsEntity() {}

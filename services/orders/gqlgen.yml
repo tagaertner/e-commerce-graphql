@@ -6,28 +6,34 @@ exec:
   package: generated
 
 model:
-  filename: generated/models_gen.go
-  package: generated
+  filename: models/models_gen.go
+  package: models
 
 models:
-  CreateOrderInput:
-    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.CreateOrderInput
-  UpdateOrderInput:
-    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.UpdateOrderInput
-  DeleteOrderInput:
-    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.DeleteOrderInput
-  SetOrderStatusInput:
-    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.SetOrderStatusInput
-  ChangeOrderQuantityInput:
-    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.ChangeOrderQuantityInput
-  Time:
-    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.Time
-  User:
-    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.User
   Order:
     model: github.com/tagaertner/e-commerce-graphql/services/orders/models.Order
   Product:
     model: github.com/tagaertner/e-commerce-graphql/services/orders/models.Product
+  User:
+    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.User
+  Time:
+    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.Time
+
+  CreateOrderInput:
+    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.CreateOrderInput
+    fields: {}
+  UpdateOrderInput:
+    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.UpdateOrderInput
+    fields: {}
+  DeleteOrderInput:
+    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.DeleteOrderInput
+    fields: {}
+  SetOrderStatusInput:
+    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.SetOrderStatusInput
+    fields: {}
+  ChangeOrderQuantityInput:
+    model: github.com/tagaertner/e-commerce-graphql/services/orders/models.ChangeOrderQuantityInput
+    fields: {}
 
 resolver:
   layout: follow-schema

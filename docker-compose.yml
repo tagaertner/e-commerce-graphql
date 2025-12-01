@@ -23,8 +23,8 @@ services:
   # 🛍️ Products Service (Go)
   products:
     build:
-      context: .
-      dockerfile: services/products/dockerfile
+      context: ./services/products
+      dockerfile: dockerfile
     env_file:
       - ./services/products/.env
     ports:
@@ -49,8 +49,8 @@ services:
   # 📦 Orders Service (Go)
   orders:
     build:
-      context: .
-      dockerfile: services/orders/dockerfile
+      context: ./services/orders
+      dockerfile: dockerfile
     env_file:
       - ./services/orders/.env
     ports:
@@ -75,8 +75,8 @@ services:
   # 🧍 Users Service (Go)
   users:
     build:
-      context: .
-      dockerfile: services/users/dockerfile
+      context: ./services/users
+      dockerfile: dockerfile
     env_file:
       - ./services/users/.env
     ports:
