@@ -12,6 +12,16 @@ model:
 models:
   User:
     model: github.com/tagaertner/e-commerce-graphql/services/users/models.User
+
+  Role:
+    model: github.com/tagaertner/e-commerce-graphql/services/users/models.Role
+
+  CreateUserInput:
+    model: github.com/tagaertner/e-commerce-graphql/services/users/models.CreateUserInput
+
+  UpdateUserInput:
+    model: github.com/tagaertner/e-commerce-graphql/services/users/models.UpdateUserInput
+
   Time:
     model: time.Time
 

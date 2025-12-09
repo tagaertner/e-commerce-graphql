@@ -1,17 +1,17 @@
 -- ===================
 -- Users
 -- ===================
-INSERT INTO users (id, name, email, role, active) VALUES 
-('1', 'John Doe', 'john@example.com', 'customer', true),
-('2', 'Jane Smith', 'jane@example.com', 'admin', true),
-('3', 'Bob Wilson', 'bob@example.com', 'customer', true),
-('4', 'Alice Johnson', 'alice@example.com', 'customer', true),
-('5', 'Mike Chen', 'mike@example.com', 'admin', true),
-('6', 'Sarah Wilson', 'sarah@example.com', 'customer', true),
-('7', 'David Brown', 'david@example.com', 'customer', false),
-('8', 'Emma Davis', 'emma@example.com', 'customer', true),
-('9', 'James Miller', 'james@example.com', 'admin', true),
-('10', 'Lisa Garcia', 'lisa@example.com', 'customer', true)
+INSERT INTO users (id, name, email, password, role, active) VALUES 
+('1', 'John Doe', 'john@example.com',       'password123', 'CUSTOMER', true),
+('2', 'Jane Smith', 'jane@example.com',     'password123', 'ADMIN',    true),
+('3', 'Bob Wilson', 'bob@example.com',      'password123', 'CUSTOMER', true),
+('4', 'Alice Johnson', 'alice@example.com', 'password123', 'CUSTOMER', true),
+('5', 'Mike Chen', 'mike@example.com',      'password123', 'ADMIN',    true),
+('6', 'Sarah Wilson', 'sarah@example.com',  'password123', 'CUSTOMER', true),
+('7', 'David Brown', 'david@example.com',   'password123', 'CUSTOMER', false),
+('8', 'Emma Davis', 'emma@example.com',     'password123', 'CUSTOMER', true),
+('9', 'James Miller', 'james@example.com',  'password123', 'ADMIN',    true),
+('10', 'Lisa Garcia', 'lisa@example.com',   'password123', 'CUSTOMER', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- ===================
@@ -24,7 +24,7 @@ INSERT INTO products (id, name, description, price, inventory, available) VALUES
 ('4', 'iPad Pro', '12.9-inch iPad Pro with M2 chip', 1099.99, 15, true),
 ('5', 'Apple Watch', 'Series 9 GPS + Cellular', 499.99, 30, true),
 ('6', 'Magic Keyboard', 'Wireless keyboard for Mac', 199.99, 20, true),
-('7', 'Studio Display', '27-inch 5K Retina display', 1599.99, 0, false), -- out of stock
+('7', 'Studio Display', '27-inch 5K Retina display', 1599.99, 0, false),
 ('8', 'AirTag', 'Bluetooth tracking device', 29.99, 100, true),
 ('9', 'HomePod mini', 'Smart speaker with Siri', 99.99, 25, true),
 ('10', 'Mac Studio', 'Compact pro desktop with M2 Max', 3999.99, 5, true),
@@ -55,32 +55,23 @@ ON CONFLICT (id) DO NOTHING;
 -- Order ↔ Product associations
 -- ===================
 INSERT INTO order_products (order_id, product_id) VALUES
--- John Doe’s order
 ('1', '1'),
 
--- Jane Smith’s order (iPhone 15 + AirPods Pro)
 ('2', '2'),
 ('2', '3'),
 
--- Bob Wilson’s order
 ('3', '3'),
 
--- Alice Johnson’s orders
 ('4', '4'),
 ('7', '7'),
 
--- Mike Chen’s order
 ('5', '5'),
 
--- Sarah Wilson’s order
 ('6', '6'),
 
--- Emma Davis’s order
 ('8', '8'),
 
--- James Miller’s order
 ('9', '9'),
 
--- Lisa Garcia’s order
 ('10', '10')
 ON CONFLICT DO NOTHING;

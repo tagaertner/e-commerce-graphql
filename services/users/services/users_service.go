@@ -35,14 +35,19 @@ func (s *UserService) GetAllUsers(ctx context.Context) ([]*models.User, error) {
 }
 
 // Mutation
-func (s *UserService)CreateUser(ctx context.Context, name, email string) (*models.User, error){
+func (s *UserService)CreateUser(ctx context.Context, name, email string, password string, role models.Role, active bool) (*models.User, error){
 	user := &models.User{
 		ID: fmt.Sprintf("user_%d", time.Now().UnixNano()),
 		Name:   name,
 		Email:  email,
-		Role:   "user",   // default role
+		Password: password,
+		Role:   role,  
 		Active: true, 
 	} 
+
+	// TODO: Hash password before saving
+	// hashed, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
 	if err := s.db.WithContext(ctx).Create(user).Error; err !=nil {
 		return nil, err
 	}

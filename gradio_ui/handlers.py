@@ -2,7 +2,8 @@
 handlers.py
 Transform UI inputs → GraphQL client calls.
 """
-
+import gradio as gr
+from datetime import datetime
 from graphql_client import (
     # User client functions
     create_user, get_users, get_user_by_id, update_user, delete_user,
@@ -22,11 +23,54 @@ from graphql_client import (
 ===========================
 """
 
-def create_user(name, email):
-    pass
+def create_user(name, email, password, role, active):
+    variables = {
+        "input": {
+            "name": name,
+            "email": email,
+            "password": password,
+            "role": role,
+            "active": active,
+        }
+    }
+    
+    result = create_user(variables["input"])
+    
+    if result is None:
+        return "❌ Error: No response from GraphQL server", "", "", "", False
 
-def list_users():
-    pass  # ADMIN
+    if "errors" in result:
+        return f"❌ Error: {result['errors'][0]['message']}", "", "", "", False
+
+    if "createUser" not in result["data"]:
+        return f"❌ Error: Unexpected response format: {result}", "", "", "", False
+
+    user = result["data"]["createUser"]
+    message = (
+        f"✅ User Created!\n\n"
+        f"ID: {user['id']}\n"
+        f"Name: {user['name']}\n"
+        f"Email: {user['email']}\n"
+        f"Role: {user['role']}\n"
+        f"Active: {user['active']}"
+    )
+
+    # Return new message + clear form fields for Gradio
+    return message, "", "", "", False
+
+# ADMIN
+def list_users(event: gr.SelectData):
+    # event.value → the selected cell value
+    # event.index → (row_index, col_index)
+
+    _, col = event.index
+
+    # Only allow clicking on the first column (user ID)
+    if col != 0:
+        return "", "❌ You can only select by clicking the User ID column."
+
+    user_id = event.value
+    return user_id, f"✅ Selected User ID: {user_id}"
 
 def get_user(user_id):
     pass  # ADMIN

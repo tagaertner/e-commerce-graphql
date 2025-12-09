@@ -16,8 +16,8 @@ async function startServer() {
           { name: "orders", url: "http://orders:4003/query" },
         ],
         introspectionHeaders: {
-          'User-Agent': 'ApolloGateway/2.5.5'
-        }
+          "User-Agent": "ApolloGateway/2.5.5",
+        },
       }),
       // Poll every 10 seconds for schema changes
       pollIntervalInMs: 10000,
@@ -26,7 +26,7 @@ async function startServer() {
         return new RemoteGraphQLDataSource({
           url,
           willSendRequest: ({ request, context }) => {
-            request.http.headers.set('apollo-federation-include-trace', 'ftv1');
+            request.http.headers.set("apollo-federation-include-trace", "ftv1");
           },
         });
       },
@@ -96,6 +96,7 @@ async function startServer() {
       user(id: "1") {
         name
         email
+        password
         # This will automatically resolve across services
       }
       products {

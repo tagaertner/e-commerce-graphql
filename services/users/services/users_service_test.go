@@ -85,6 +85,9 @@ func TestGetUserByID_ReturnsUser_WhenExists(t *testing.T){
 		ctx,
 		"Tina Test",
 		"tinatest@test.com",
+		"password",
+		models.RoleCustomer,
+		true,
 	)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, created.ID)
@@ -190,6 +193,9 @@ func TestCreateUser_Success(t *testing.T){
 		ctx,
 		"user1",
 		"1user@test.com",
+		"password",
+		models.RoleCustomer,
+		true,
 	)
 	
 	assert.NoError(t, err)
@@ -212,6 +218,9 @@ func TestCreateUser_ReturnsError_WhenDatabaseFails(t *testing.T){
 		ctx,
 		" ",
 		"3user@test.com",
+		" ",
+		models.RoleAdmin,
+		true,
 	)
 	assert.Error(t, err, "invalid database")
 	assert.Nil(t, created, "user should not be created when userID or user name is invalid")

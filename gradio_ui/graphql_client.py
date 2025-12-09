@@ -34,6 +34,7 @@ def create_user(input_data):
             id
             name
             email
+            password
             role
             active
         }
@@ -59,6 +60,7 @@ def update_user(input_data):
             id
             name
             email
+    
         }
     }
     """

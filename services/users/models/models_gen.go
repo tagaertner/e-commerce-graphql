@@ -2,21 +2,8 @@
 
 package models
 
-type CreateUserInput struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
-}
-
 type Mutation struct {
 }
 
 type Query struct {
-}
-
-type UpdateUserInput struct {
-	ID     string  `json:"id"`
-	Name   *string `json:"name,omitempty"`
-	Email  *string `json:"email,omitempty"`
-	Role   *string `json:"role,omitempty"`
-	Active *bool   `json:"active,omitempty"`
 }

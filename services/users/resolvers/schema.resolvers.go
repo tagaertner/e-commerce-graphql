@@ -14,7 +14,14 @@ import (
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input models.CreateUserInput) (*models.User, error) {
-	return r.UserService.CreateUser(ctx, input.Name, input.Email)
+	return r.UserService.CreateUser(
+		ctx,
+		input.Name,
+		input.Email,
+		input.Password,
+		input.Role,
+		input.Active,
+	)
 }
 
 // UpdateUser is the resolver for the updateUser field.
