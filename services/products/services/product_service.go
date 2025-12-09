@@ -5,8 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"time"
+	"github.com/google/uuid"
 
+	// "github.com/tagaertner/e-commerce-graphql/services/products/generated"
 	"github.com/tagaertner/e-commerce-graphql/services/products/models"
 	"gorm.io/gorm"
 )
@@ -41,19 +42,19 @@ func (s *ProductService) CreateProduct(ctx context.Context,  name string, price 
 		return nil, fmt.Errorf("invalid product name: missing or invalid field")
 	}
 	if price <= 0 {
-		return nil, fmt.Errorf("invalid product name: missing or invalid field")
+		return nil, fmt.Errorf("price must be greater than zero")
 	}
-	if inventory <= 0 {
-		return nil, fmt.Errorf("invalid product inventory: must be greater than zero")
+	if inventory < 0 {
+		return nil, fmt.Errorf(" inventory cannot be negative")
 	}
 
 	product := &models.Product{
-		ID:   fmt.Sprintf("product_%d", time.Now().UnixNano()),
+		ID:    uuid.NewString(),
 		Name: name,
 		Price: price,
 		Description: &description,
 		Inventory: inventory,
-		Available: true,
+		Available: inventory > 0,
 	}
 	
 	if err := s.db.WithContext(ctx).Create(product).Error; err != nil{
@@ -164,3 +165,42 @@ func (s *ProductService)SetProductAvailability(ctx context.Context, id string, a
 	}
 	return &product, nil
 }
+
+// GetAllProducts returns filderd products from db
+func (s *ProductService) GetAllProductsCursor(ctx context.Context,  after *string, first int) ([]*models.Product, bool, error ){
+	var products []*models.Product
+
+    query := s.db.WithContext(ctx).
+        Model(&models.Product{}).
+        Order("id ASC")
+
+    // If we have a cursor, decode it and filter
+    if after != nil && *after != "" {
+        lastID, err := DecodeCursor(*after)
+        if err != nil {
+            return nil, false, fmt.Errorf("invalid cursor: %w", err)
+        }
+
+        // Only return products *after* this ID
+        query = query.Where("id > ?", lastID)
+    }
+
+    // Fetch first + 1 to check if there's a next page
+    if err := query.Limit(first + 1).Find(&products).Error; err != nil {
+        return nil, false, err
+    }
+
+    // Check if there are more results
+    hasNextPage := len(products) > first
+    if hasNextPage {
+        products = products[:first]
+    }
+
+    return products, hasNextPage, nil
+}
+func (s *ProductService) CountProducts(ctx context.Context) (int, error) {
+    var total int64
+    err := s.db.Model(&models.Product{}).Count(&total).Error
+    return int(total), err
+}
+

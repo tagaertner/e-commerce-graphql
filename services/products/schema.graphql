@@ -10,8 +10,27 @@ type Product @key(fields: "id") {
 }
 
 extend type Query {
-  products: [Product!]!
   product(id: ID!): Product
+
+  products: [Product!]!
+
+  productsCursor(after: String, first: Int = 10): ProductConnection!
+}
+
+type ProductConnection {
+  edges: [ProductEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type ProductEdge {
+  cursor: String!
+  node: Product!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String
 }
 
 # Mutation

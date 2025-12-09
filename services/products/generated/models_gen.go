@@ -2,19 +2,28 @@
 
 package generated
 
+import (
+	"github.com/tagaertner/e-commerce-graphql/services/products/models"
+)
+
 type Mutation struct {
 }
 
-type Product struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	Price       float64 `json:"price"`
-	Description *string `json:"description,omitempty"`
-	Inventory   int     `json:"inventory"`
-	Available   bool    `json:"available"`
+type PageInfo struct {
+	HasNextPage bool    `json:"hasNextPage"`
+	EndCursor   *string `json:"endCursor,omitempty"`
 }
 
-func (Product) IsEntity() {}
+type ProductConnection struct {
+	Edges      []*ProductEdge `json:"edges"`
+	PageInfo   *PageInfo      `json:"pageInfo"`
+	TotalCount int            `json:"totalCount"`
+}
+
+type ProductEdge struct {
+	Cursor string          `json:"cursor"`
+	Node   *models.Product `json:"node"`
+}
 
 type Query struct {
 }

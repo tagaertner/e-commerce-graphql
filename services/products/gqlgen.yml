@@ -16,6 +16,8 @@ models:
     model: github.com/tagaertner/e-commerce-graphql/services/products/models.UpdateProductInput
   DeleteProductInput:
     model: github.com/tagaertner/e-commerce-graphql/services/products/models.DeleteProductInput
+  Product:
+    model: github.com/tagaertner/e-commerce-graphql/services/products/models.Product
 
 resolver:
   layout: follow-schema

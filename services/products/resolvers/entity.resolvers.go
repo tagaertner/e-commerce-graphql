@@ -9,10 +9,11 @@ import (
 	"context"
 
 	"github.com/tagaertner/e-commerce-graphql/services/products/generated"
+	"github.com/tagaertner/e-commerce-graphql/services/products/models"
 )
 
 // FindProductByID is the resolver for the findProductByID field.
-func (r *entityResolver) FindProductByID(ctx context.Context, id string) (*generated.Product, error) {
+func (r *entityResolver) FindProductByID(ctx context.Context, id string) (*models.Product, error) {
 	product, err := r.ProductService.GetProductByID(id)
 	if err != nil {
 		return nil, err

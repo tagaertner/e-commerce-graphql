@@ -7,13 +7,15 @@ package resolvers
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/tagaertner/e-commerce-graphql/services/products/generated"
 	"github.com/tagaertner/e-commerce-graphql/services/products/models"
+	"github.com/tagaertner/e-commerce-graphql/services/products/services"
 )
 
 // CreateProduct is the resolver for the createProduct field.
-func (r *mutationResolver) CreateProduct(ctx context.Context, input models.CreateProductInput) (*generated.Product, error) {
+func (r *mutationResolver) CreateProduct(ctx context.Context, input models.CreateProductInput) (*models.Product, error) {
 	product, err := r.ProductService.CreateProduct(ctx, input.Name, input.Price, *input.Description, input.Inventory)
 	if err != nil {
 		return nil, err
@@ -22,7 +24,7 @@ func (r *mutationResolver) CreateProduct(ctx context.Context, input models.Creat
 }
 
 // UpdateProduct is the resolver for the updateProduct field.
-func (r *mutationResolver) UpdateProduct(ctx context.Context, id string, input models.UpdateProductInput) (*generated.Product, error) {
+func (r *mutationResolver) UpdateProduct(ctx context.Context, id string, input models.UpdateProductInput) (*models.Product, error) {
 	product, err := r.ProductService.UpdateProduct(ctx, id, input)
 	if err != nil {
 		return nil, err
@@ -36,7 +38,7 @@ func (r *mutationResolver) DeleteProduct(ctx context.Context, input models.Delet
 }
 
 // RestockProduct is the resolver for the restockProduct field.
-func (r *mutationResolver) RestockProduct(ctx context.Context, input generated.RestockProductInput) (*generated.Product, error) {
+func (r *mutationResolver) RestockProduct(ctx context.Context, input generated.RestockProductInput) (*models.Product, error) {
 	updatedProduct, err := r.ProductService.RestockProduct(ctx, input.ID, input.Quantity)
 	if err != nil {
 		return nil, err
@@ -45,7 +47,7 @@ func (r *mutationResolver) RestockProduct(ctx context.Context, input generated.R
 }
 
 // SetProductAvailability is the resolver for the setProductAvailability field.
-func (r *mutationResolver) SetProductAvailability(ctx context.Context, input generated.SetProductAvailabilityInput) (*generated.Product, error) {
+func (r *mutationResolver) SetProductAvailability(ctx context.Context, input generated.SetProductAvailabilityInput) (*models.Product, error) {
 	product, err := r.ProductService.SetProductAvailability(ctx, input.ID, input.Available)
 	if err != nil {
 		return nil, err
@@ -53,8 +55,17 @@ func (r *mutationResolver) SetProductAvailability(ctx context.Context, input gen
 	return ToGraphQLProduct(product), nil
 }
 
+// Products is the resolver for the products field.
+func (r *queryResolver) Product(ctx context.Context, id string) (*models.Product, error) {
+	product, err := r.ProductService.GetProductByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return ToGraphQLProduct(product), nil
+}
+
 // Product is the resolver for the product field.
-func (r *queryResolver) Products(ctx context.Context) ([]*generated.Product, error) {
+func (r *queryResolver) Products(ctx context.Context) ([]*models.Product, error) {
 	products, err := r.ProductService.GetAllProducts()
 	if err != nil {
 		return nil, err
@@ -62,13 +73,52 @@ func (r *queryResolver) Products(ctx context.Context) ([]*generated.Product, err
 	return ToGraphQLProductList(products), nil
 }
 
-// Products is the resolver for the products field.
-func (r *queryResolver) Product(ctx context.Context, id string) (*generated.Product, error) {
-	product, err := r.ProductService.GetProductByID(id)
+// ProductsCursor is the resolver for the productsCursor field.
+func (r *queryResolver) ProductsCursor(ctx context.Context, after *string, first *int) (*generated.ProductConnection, error) {
+	// set default
+	f := 10
+	if first != nil {
+		f = *first
+	}
+
+	// Validate first
+	if f <= 0 || f > 100 {
+		return nil, fmt.Errorf("first must be between 1 - 100")
+	}
+	// Get products from service
+	products, hasNextPage, err := r.ProductService.GetAllProductsCursor(ctx, after, f)
 	if err != nil {
 		return nil, err
 	}
-	return ToGraphQLProduct(product), nil
+
+	//Build edges
+	edges := make([]*generated.ProductEdge, len(products))
+	for i, product := range products {
+		edges[i] = &generated.ProductEdge{
+			Cursor: services.EncodeCursor(product),
+			Node:   ToGraphQLProduct(product),
+		}
+	}
+	var endCursor *string
+	if len(edges) > 0 {
+		cursor := edges[len(edges)-1].Cursor
+		endCursor = &cursor
+	}
+
+	totalCount, err := r.ProductService.CountProducts(ctx)
+	if err != nil {
+		return nil, err
+	}
+	// Build connection
+	connection := &generated.ProductConnection{
+		Edges: edges,
+		PageInfo: &generated.PageInfo{
+			HasNextPage: hasNextPage,
+			EndCursor:   endCursor,
+		},
+		TotalCount: totalCount,
+	}
+	return connection, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
