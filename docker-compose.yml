@@ -99,6 +99,16 @@ services:
       start_period: 40s
 
   # Todo Gradio Frontend Service (Python)
+  gradio-ui:
+    build:
+      context: .
+      dockerfile: gradio_ui/dockerfile
+    ports:
+      - "${PORT_GRADIO}:4004"
+    depends_on:
+      - gateway
+    env_file:
+      - .env
 
   # Seed runs after services create tables
   db-seed:

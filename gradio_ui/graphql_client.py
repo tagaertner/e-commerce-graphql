@@ -3,6 +3,9 @@ import os
 
 GQL_ENDPOINT = os.getenv("GRAPHQL_ENDPOINT", "http://gateway:4000/graphql")
 
+# GQL_ENDPOINT = os.getenv("GQL_ENDPOINT", "http://localhost:4000/graphql")
+
+
 def gql_request(query, variables=None):
     try:
         response = requests.post(
@@ -34,7 +37,6 @@ def create_user(input_data):
             id
             name
             email
-            password
             role
             active
         }
@@ -83,26 +85,31 @@ def delete_user(user_id):
 """
 
 # Customer
-def get_products(limit=10, offset=0, search=None):
+def get_products_cursor(after=None, first=10):
     query = """
-    query GetProducts($limit: Int, $offset: Int, $search: String) {
-        products(limit: $limit, offset: $offset, search: $search) {
-            id
-            name
-            price
-            description
-            inventory
-            available
+    query GetProductsCursor($after: String, $first: Int) {
+        productsCursor(after: $after, first: $first) {
+            edges {
+                cursor
+                node {
+                    id
+                    name
+                    price
+                    description
+                    inventory
+                    available
+                }
+            }
+            pageInfo {
+                hasNextPage
+                endCursor
+            }
+            totalCount
         }
     }
     """
 
-    variables = {
-        "limit": limit,
-        "offset": offset,
-        "search": search
-    }
-
+    variables = {"after": after, "first": first}
     return gql_request(query, variables)
 
 
