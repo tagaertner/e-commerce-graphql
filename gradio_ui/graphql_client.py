@@ -116,7 +116,7 @@ def get_products_cursor(after=None, first=10):
 # Customer
 def get_product_by_id(product_id):
     query = """
-    query GetProduct($id ID!){
+    query GetProduct($id: ID!){
         product(id: $id){
             id
             name

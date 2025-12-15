@@ -16,6 +16,20 @@ from handlers import (
     handle_get_order, handle_update_order, handle_delete_order
 )
 
+def select_product_row(event: gr.SelectData, products):
+    # Guard: products not loaded yet
+    if not products:
+        return ""
+
+    row, _ = event.index
+
+    # Guard: invalid row
+    if row < 0 or row >= len(products):
+        return ""
+
+    # Always return ID from column 0
+    return products[row][0]
+
 def build_interface():
     with gr.Blocks() as demo:
 
@@ -36,12 +50,6 @@ def build_interface():
             create_btn = gr.Button("Create Account")
             create_output = gr.Textbox(label="Result", interactive=False)
 
-            # (Wire handler later)
-            create_btn.click(
-                fn=handle_create_user,
-                inputs=[name, email, password, active],
-                outputs=[create_output, name, email, password, active]
-            )
 
             gr.Markdown("---")
             gr.Markdown("## 🔐 Admin Actions")
@@ -59,6 +67,9 @@ def build_interface():
             # Pagination state
             cursor_state = gr.State(value=None)
             
+            products_state = gr.State(value=[])
+            
+            selected_product_id = gr.State(value="")
             with gr.Row():
                 page_size = gr.Number(
                     value=10,
@@ -68,7 +79,8 @@ def build_interface():
                     label="Products per page",
                 )
                 load_btn = gr.Button("Load Products 🔄")
-                next_btn = gr.Button("Next Page 📃") 
+                next_btn = gr.Button("Next Page ⏭️") 
+                # TODo need prev page
                 
             products_table = gr.Dataframe(
                 headers=["ID", "Name", "Price"],
@@ -77,30 +89,61 @@ def build_interface():
                 label="Product List",
             ) 
             
+
+            
             gr.Markdown("### 🔍 Product Details")
             
-            product_id_input = gr.Textbox(
-                label="Product ID",
-                placeholder="Paste or type a product ID from the table above",
-            )
+            # product_id_input = gr.Textbox(
+            #     label="Product ID",
+            #     placeholder="Paste or type a product ID from the table above",
+            # )
             product_details_btn =gr.Button("View Product Details")
+            
             product_details_output = gr.Textbox(
                 label="Product Details",
                 lines=8,
                 interactive=False,
             )
             
-            #  === EVENT HANDLERS === 
+            
+            gr.Markdown("*Product listing UI will go here*")
+
+            gr.Markdown("---")
+            gr.Markdown("## 🔐 Admin Management")
+            gr.Markdown("*Admin product tools coming later.*")
+            
+            
+             #  === EVENT HANDLERS === 
+             
+            create_btn.click(
+                fn=handle_create_user,
+                inputs=[name, email, password, active],
+                outputs=[create_output, name, email, password, active]
+            )
+            
+            products_table.select(
+                fn=select_product_row,
+                inputs=[products_state],
+                outputs=[selected_product_id]
+            )
+            
+            selected_product_id.change(
+                fn=handle_get_product,
+                inputs=[selected_product_id],
+                outputs=[product_details_output],
+            )
+            
             load_btn.click(
                 fn=lambda first: handle_list_products(None, first),
                 inputs=[page_size],
-                outputs=[products_table, cursor_state]
+                outputs=[products_table, cursor_state, products_state]
             )
             
+            # TODO need previous page btn
             next_btn.click(
                 fn=handle_list_products,
                 inputs=[cursor_state, page_size],
-                 outputs=[products_table, cursor_state],
+                outputs=[products_table, cursor_state, products_state],
             )
             
             product_details_btn.click(
@@ -108,11 +151,8 @@ def build_interface():
                 inputs=[product_id_input],
                 outputs=[product_details_output],
             )
-            gr.Markdown("*Product listing UI will go here*")
+            
 
-            gr.Markdown("---")
-            gr.Markdown("## 🔐 Admin Management")
-            gr.Markdown("*Admin product tools coming later.*")
 
         # =======================
         # ORDERS TAB

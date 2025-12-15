@@ -114,35 +114,21 @@ def handle_add_product(name, price, description, inventory):
 
 def handle_list_products(after=None, first=10):
     result = gql_get_products_cursor(after, first)
-    
-    # Handle GraphQL/network errors
-    if result is None:
-        return "❌ No response from server", [], None
-    
-    if "error" in result:
-        return f"❌ Error: {result['error']}", [], None
+
+    if result is None or "error" in result:
+        return [], None, []
 
     data = result.get("productsCursor")
-    if not data:
-        return "❌ Unexpected response format", [], None
-
-    # Extract edges
     edges = data["edges"]
-    
-    # Build rows for Gradio
-    rows = []
-    for edge in edges:
-        node = edge["node"]
-        rows.append([
-            node["id"],
-            node["name"],
-            node["price"],
-        ])
-        
-    # Extract pagination cursor
+
+    rows = [
+        [edge["node"]["id"], edge["node"]["name"], edge["node"]["price"]]
+        for edge in edges
+    ]
+
     next_cursor = data["pageInfo"]["endCursor"]
 
-    return rows, next_cursor
+    return rows, next_cursor, rows
 
 def handle_get_product(product_id):
     result = gql_get_product_by_id(product_id)
