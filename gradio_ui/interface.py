@@ -93,11 +93,12 @@ def build_interface():
             
             gr.Markdown("### 🔍 Product Details")
             
-            # product_id_input = gr.Textbox(
-            #     label="Product ID",
-            #     placeholder="Paste or type a product ID from the table above",
-            # )
-            product_details_btn =gr.Button("View Product Details")
+            product_id_input = gr.Textbox(
+                visible=False,
+                label="Product ID",
+                placeholder="Paste or type a product ID from the table above",
+            )
+            # product_details_btn =gr.Button("View Product Details")
             
             product_details_output = gr.Textbox(
                 label="Product Details",
@@ -146,11 +147,11 @@ def build_interface():
                 outputs=[products_table, cursor_state, products_state],
             )
             
-            product_details_btn.click(
-                fn=handle_get_product,
-                inputs=[product_id_input],
-                outputs=[product_details_output],
-            )
+            # product_details_btn.click(
+            #     fn=handle_get_product,
+            #     inputs=[product_id_input],
+            #     outputs=[product_details_output],
+            # )
             
 
 
