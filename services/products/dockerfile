@@ -24,9 +24,6 @@ RUN apk --no-cache add ca-certificates
 
 COPY --from=builder /app/server .
 
-COPY --from=builder /app/.env* ./
-
-# To this:
 EXPOSE 4001
 
 CMD ["./server"]
