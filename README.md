@@ -6,36 +6,60 @@ This project was designed to demonstrate **backend architecture**, **service com
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 > Note: The Gradio UI is still evolving and is used to validate backend behavior rather than serve as a full client. It currently supports user creation, product browsing, and product detail exploration.
 
-- GraphQL Playground: `http://localhost:4000`
-- Gradio UI: `http://localhost:4004`
-
-**Prereqs:** Docker Desktop/Engine.
+**Prerequisites:** Docker Desktop or Docker Engine
 
 #### Configure Environment
 
-1. Create `.env` with database credentials:
+1. Copy the example environment file:
 
 ```bash
-POSTGRES_USER=ecom_user
-POSTGRES_PASSWORD=your_password_here
-POSTGRES_DB=ecom_db
+cp .env.example .env
 ```
 
-2. Start services:
+2. (Optional) Edit `.env` if needed—defaults work for local development
+
+3. Start services:
 
 ```bash
 docker compose up --build
 ```
 
+4. Access the application:
+
+- GraphQL Playground: http://localhost:4000
+- Gradio UI: http://localhost:4004
+
+---
+
+## Troubleshooting
+
+**Port conflicts:**
+If you see "port is already allocated", check for other running containers:
+
+```bash
+docker ps -a
+```
+
+Stop conflicting services or change ports in `.env`
+
+**Services won't start:**
+
+```bash
+docker compose down -v
+docker compose up --build
+```
+
+**Database connection errors:**
+Health checks take ~30s. Wait for all services to show as healthy.
 (Services run on ports 4000-4004 by default. )
 
 ## Why This Project
 
-I built this system to go beyond CRUD demos and models what I have learned
+I built this system to go beyond CRUD demos and model how real backend teams design:
 
 - independently deployable services
 - federated GraphQL schemas
@@ -86,7 +110,7 @@ For setup details, environment variables, and sample queries:
 
 ## Status
 
-Actively evolving — authentication, authorization, and testing planned next.
+Actively evolving — authentication, authorization, and testing
 
 The Gradio UI is intentionally lightweight and still evolving.
 

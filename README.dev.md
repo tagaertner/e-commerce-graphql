@@ -57,20 +57,33 @@ This project focuses on **backend architecture**, **service boundaries**, and **
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
-- Docker
-- Docker Compose
+- Docker Desktop or Docker Engine
+- Docker Compose V2 (included with Docker Desktop)
 
 ### Run the Platform
 
+1. Copy the example environment file:
+
 ```bash
-git clone https://github.com/tagaertner/e-commerce-graphql.git
-cd e-commerce-graphql
-docker-compose up --build
+cp .env.example .env
 ```
+
+2. (Optional) Edit `.env` if needed—defaults work for local development
+
+3. Start services:
+
+```bash
+docker compose up --build
+```
+
+4. Access the application:
+
+- GraphQL Playground: http://localhost:4000
+- Gradio UI: http://localhost:4004
 
 ### Available Services
 
@@ -168,7 +181,7 @@ mutation {
       productIds: ["1", "2"]
       quantity: 2
       totalPrice: 3999.98
-      status: PENDING
+      status: "PENDING"
       createdAt: "2025-01-01T12:00:00Z"
     }
   ) {
