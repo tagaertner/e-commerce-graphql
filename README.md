@@ -13,15 +13,29 @@ This project was designed to demonstrate **backend architecture**, **service com
 - GraphQL Playground: `http://localhost:4000`
 - Gradio UI: `http://localhost:4004`
 
-To run locally:
+**Prereqs:** Docker Desktop/Engine.
+
+#### Configure Environment
+
+1. Create `.env` with database credentials:
 
 ```bash
-docker-compose up --build
+POSTGRES_USER=ecom_user
+POSTGRES_PASSWORD=your_password_here
+POSTGRES_DB=ecom_db
 ```
+
+2. Start services:
+
+```bash
+docker compose up --build
+```
+
+(Services run on ports 4000-4004 by default. )
 
 ## Why This Project
 
-I built this system to go beyond CRUD demos and model how real backend teams design:
+I built this system to go beyond CRUD demos and models what I have learned
 
 - independently deployable services
 - federated GraphQL schemas

@@ -5,7 +5,8 @@ services:
   db:
     image: postgres:16
     ports:
-      - "${DB_PORT_HOST}:5432"
+      - "${DB_PORT_HOST:-5432}:5432"
+      # - "55432:5432"
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -28,7 +29,8 @@ services:
     env_file:
       - ./services/products/.env
     ports:
-      - "${PORT_PRODUCTS}:4001"
+      # - "${PORT_PRODUCTS}:4001"
+      - "${PORT_PRODUCTS:-4001}:4001"
     environment:
       - DB_HOST=db
       - DB_PORT=5432
@@ -54,7 +56,8 @@ services:
     env_file:
       - ./services/orders/.env
     ports:
-      - "${PORT_ORDERS}:4003"
+      # - "${PORT_ORDERS}:4003"
+      - "${PORT_ORDERS:-4003}:4003"
     environment:
       - DB_HOST=db
       - DB_PORT=5432
@@ -80,7 +83,8 @@ services:
     env_file:
       - ./services/users/.env
     ports:
-      - "${PORT_USERS}:4002"
+      # - "${PORT_USERS}:4002"
+      - "${PORT_USERS:-4002}:4002"
     environment:
       - DB_HOST=db
       - DB_PORT=5432
@@ -98,13 +102,14 @@ services:
       retries: 3
       start_period: 40s
 
-  # Todo Gradio Frontend Service (Python)
+  # Gradio Frontend Service (Python)
   gradio-ui:
     build:
       context: .
       dockerfile: gradio_ui/dockerfile
     ports:
-      - "${PORT_GRADIO}:4004"
+      # - "${PORT_GRADIO}:4004"
+      - "${PORT_GRADIO:-4004}:4004"
     depends_on:
       - gateway
     env_file:
@@ -144,7 +149,8 @@ services:
     env_file:
       - .env
     ports:
-      - "${PORT_GATEWAY}:4000"
+      # - "${PORT_GATEWAY}:4000"
+      - "${PORT_GATEWAY:-4000}:4000"
     depends_on:
       orders:
         condition: service_started
