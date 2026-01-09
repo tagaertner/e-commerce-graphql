@@ -20,15 +20,13 @@ This project was designed to demonstrate **backend architecture**, **service com
 cp .env.example .env
 ```
 
-2. (Optional) Edit `.env` if needed—defaults work for local development
-
-3. Start services:
+2. Start services:
 
 ```bash
 docker compose up --build
 ```
 
-4. Access the application:
+3. Access the application:
 
 - GraphQL Playground: http://localhost:4000
 - Gradio UI: http://localhost:4004
