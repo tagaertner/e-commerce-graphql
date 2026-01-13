@@ -12,6 +12,21 @@ services:
         fromDatabase:
           name: products-db
           property: connectionString
+      - key: PRODUCTS_URL
+        fromService:
+          type: pserv
+          name: products
+          property: hostport
+      - key: ORDERS_URL
+        fromService:
+          type: pserv
+          name: orders
+          property: hostport
+      - key: USERS_URL
+        fromService:
+          type: pserv
+          name: users
+          property: hostport
 
   # Products Service
   - type: pserv

@@ -16,9 +16,9 @@ async function startServer() {
         //   { name: "orders", url: "http://orders:4003/query" },
         // ],
         subgraphs: [
-          { name: "products", url: process.env.PRODUCTS_URL || "http://products:4001/query" },
-          { name: "users", url: process.env.USERS_URL || "http://users:4002/query" },
-          { name: "orders", url: process.env.ORDERS_URL || "http://orders:4003/query" },
+          { name: "products", url: `http://${process.env.PRODUCTS_URL}/query` || "http://products:4001/query" },
+          { name: "users", url: `http://${process.env.USERS_URL}/query` || "http://users:4002/query" },
+          { name: "orders", url: `http://${process.env.ORDERS_URL}/query` || "http://orders:4003/query" },
         ],
         introspectionHeaders: {
           "User-Agent": "ApolloGateway/2.5.5",
