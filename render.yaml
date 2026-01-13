@@ -1,35 +1,24 @@
 services:
+  # Gateway (Node runtime)
   - type: web
     name: gateway
     runtime: node
     plan: free
     rootDir: gateway
-    buildCommand: npm install
+    buildCommand: npm ci
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
         value: "22.16.0"
-      - key: DATABASE_URL
-        fromDatabase:
-          name: products-db
-          property: connectionString
-      - key: PRODUCTS_URL
-        fromService:
-          type: pserv
-          name: products
-          property: hostport
-      - key: ORDERS_URL
-        fromService:
-          type: pserv
-          name: orders
-          property: hostport
-      - key: USERS_URL
-        fromService:
-          type: pserv
-          name: users
-          property: hostport
+      # Pass host:port for each subgraph (internal DNS)
+      - key: PRODUCTS_HOSTPORT
+        fromService: { type: pserv, name: products, property: hostport }
+      - key: USERS_HOSTPORT
+        fromService: { type: pserv, name: users, property: hostport }
+      - key: ORDERS_HOSTPORT
+        fromService: { type: pserv, name: orders, property: hostport }
 
-  # Products Service
+  # Products (Go, private)
   - type: pserv
     name: products
     runtime: docker
@@ -37,25 +26,13 @@ services:
     dockerContext: ./services/products
     plan: starter
     envVars:
+      - key: PORT
+        value: "4001"
+      # Use the DB connection string Render exposes
       - key: DATABASE_URL
-        fromDatabase:
-          name: products-db
-          property: connectionString
+        fromDatabase: { name: products-db, property: connectionString }
 
-  # Orders Service
-  - type: pserv
-    name: orders
-    runtime: docker
-    dockerfilePath: ./services/orders/dockerfile
-    dockerContext: ./services/orders
-    plan: starter
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: products-db
-          property: connectionString
-
-  # Users Service
+  # Users (Go, private)
   - type: pserv
     name: users
     runtime: docker
@@ -63,12 +40,25 @@ services:
     dockerContext: ./services/users
     plan: starter
     envVars:
+      - key: PORT
+        value: "4002"
       - key: DATABASE_URL
-        fromDatabase:
-          name: products-db
-          property: connectionString
+        fromDatabase: { name: products-db, property: connectionString }
 
-  # Gradio UI
+  # Orders (Go, private)
+  - type: pserv
+    name: orders
+    runtime: docker
+    dockerfilePath: ./services/orders/dockerfile
+    dockerContext: ./services/orders
+    plan: starter
+    envVars:
+      - key: PORT
+        value: "4003"
+      - key: DATABASE_URL
+        fromDatabase: { name: products-db, property: connectionString }
+
+  # Optional: Gradio UI (public)
   - type: web
     name: gradio-ui
     runtime: docker
