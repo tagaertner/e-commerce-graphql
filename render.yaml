@@ -3,7 +3,7 @@ services:
   - type: web
     name: gateway
     runtime: node
-    rootDir: ./gateway
+    rootDir: gateway
     plan: free
     buildCommand: npm install
     startCommand: npm start
