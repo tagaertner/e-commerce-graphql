@@ -109,7 +109,7 @@ services:
       dockerfile: gradio_ui/dockerfile
     ports:
       # - "${PORT_GRADIO}:4004"
-      - "${PORT_GRADIO:-4004}:4004"
+      - "${PORT:-4004}:4004"
     depends_on:
       - gateway
     # env_file:

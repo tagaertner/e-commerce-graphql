@@ -18,7 +18,7 @@ import (
 	"github.com/tagaertner/e-commerce-graphql/services/users/services"
 )
 
-const defaultPort = "4002"
+// const defaultPort = "4002"
 
 func main() {
     // Only load .env file when not in Docker
@@ -56,7 +56,7 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = defaultPort
+		port = "4002"
 	}
 
 	// Pass db into resolver

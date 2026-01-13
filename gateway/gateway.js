@@ -10,15 +10,21 @@ async function startServer() {
     // Create the federation gateway
     const gateway = new ApolloGateway({
       supergraphSdl: new IntrospectAndCompose({
+        // subgraphs: [
+        //   { name: "products", url: "http://products:4001/query" },
+        //   { name: "users", url: "http://users:4002/query" },
+        //   { name: "orders", url: "http://orders:4003/query" },
+        // ],
         subgraphs: [
-          { name: "products", url: "http://products:4001/query" },
-          { name: "users", url: "http://users:4002/query" },
-          { name: "orders", url: "http://orders:4003/query" },
+          { name: "products", url: process.env.PRODUCTS_URL || "http://products:4001/query" },
+          { name: "users", url: process.env.USERS_URL || "http://users:4002/query" },
+          { name: "orders", url: process.env.ORDERS_URL || "http://orders:4003/query" },
         ],
         introspectionHeaders: {
           "User-Agent": "ApolloGateway/2.5.5",
         },
       }),
+
       // Poll every 10 seconds for schema changes
       pollIntervalInMs: 10000,
       // Add explicit federation configuration
@@ -75,10 +81,15 @@ async function startServer() {
     });
 
     // Start the server
+    // const { url } = await startStandaloneServer(server, {
+    //   listen: { port: 4000 },
+    // });
     const { url } = await startStandaloneServer(server, {
-      listen: { port: 4000 },
+      listen: {
+        port: process.env.PORT || 4000,
+        host: "0.0.0.0",
+      },
     });
-
     // Success logging
     console.log("✅ Federation Gateway Successfully Started!");
     console.log("");

@@ -1,6 +1,6 @@
 module github.com/tagaertner/e-commerce-graphql/services/products
 
-go 1.24.10
+go 1.24.1
 
 require (
 	github.com/99designs/gqlgen v0.17.84

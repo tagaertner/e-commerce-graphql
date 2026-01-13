@@ -19,7 +19,7 @@ import (
 
 )
 
-const defaultPort = "4003"
+// const defaultPort = "4003"
 
 func main() {
     // Only load .env file when not in Docker
@@ -58,7 +58,7 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = defaultPort
+		port = "4003"
 	}
 
 // Creates Order services with data
