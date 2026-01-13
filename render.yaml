@@ -1,12 +1,10 @@
 services:
-  # Gateway
   - type: web
     name: gateway
     runtime: node
-    rootDir: gateway
     plan: free
-    buildCommand: npm install
-    startCommand: npm start
+    buildCommand: cd gateway && npm install
+    startCommand: cd gateway && npm start
     envVars:
       - key: NODE_VERSION
         value: "22.16.0"
