@@ -38,12 +38,14 @@ services:
           name: products-db
           property: connectionString
 
-  # Gateway
+  # Gateway (Node runtime)
   - type: web
     name: gateway
-    runtime: docker
-    dockerfilePath: ./gateway/dockerfile
+    runtime: node
+    rootDir: ./gateway
     plan: free
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: DATABASE_URL
         fromDatabase:
