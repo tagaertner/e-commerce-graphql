@@ -9,3 +9,7 @@ dist/
 /resolvers/
 /models/
 /gqlgen.yml
+
+venv/
+__pycache__/
+*.pyc
