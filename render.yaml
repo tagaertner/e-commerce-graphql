@@ -3,7 +3,7 @@ services:
     name: gateway
     runtime: node
     plan: free
-    rootDir: gateway/src
+    rootDir: gateway
     buildCommand: npm install
     startCommand: npm start
     envVars:
