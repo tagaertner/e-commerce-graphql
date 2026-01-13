@@ -1,0 +1,62 @@
+services:
+  # Products Service
+  - type: pserv
+    name: products
+    runtime: docker
+    dockerfilePath: ./services/products/dockerfile
+    dockerContext: ./services/products
+    plan: starter
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: products-db
+          property: connectionString
+
+  # Orders Service
+  - type: pserv
+    name: orders
+    runtime: docker
+    dockerfilePath: ./services/orders/dockerfile
+    dockerContext: ./services/orders
+    plan: starter
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: products-db
+          property: connectionString
+
+  # Users Service
+  - type: pserv
+    name: users
+    runtime: docker
+    dockerfilePath: ./services/users/dockerfile
+    dockerContext: ./services/users
+    plan: starter
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: products-db
+          property: connectionString
+
+  # Gateway
+  - type: web
+    name: gateway
+    runtime: docker
+    dockerfilePath: ./gateway/dockerfile
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: products-db
+          property: connectionString
+
+  # Gradio UI
+  - type: web
+    name: gradio-ui
+    runtime: docker
+    dockerfilePath: ./gradio_ui/dockerfile
+    plan: free
+
+databases:
+  - name: products-db
+    plan: free
