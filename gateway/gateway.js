@@ -7,6 +7,12 @@ const { ApolloServerPluginLandingPageLocalDefault } = require("@apollo/server/pl
 // Default path matches your Go services (change to "/graphql" if you switch your handlers)
 const DEFAULT_PATH = process.env.SUBGRAPH_PATH || "/query";
 
+// put this helper near the top
+function fromEnv(name, fallback) {
+  const v = process.env[name];
+  return v && v.trim() ? v.trim() : fallback;
+}
+
 function pickUrl(name, port) {
   const U = name.toUpperCase();
 
