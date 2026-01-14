@@ -11,7 +11,13 @@ import(
 )
 
 func Connect() *gorm.DB{
-	dsn := fmt.Sprintf(
+	// Tyr DATABASE_URL first for Render/production
+	dbURL := os.Getenv("DATABASE_URL")
+
+	// Fallback to individual vars for local dev
+	if dbURL == ""{
+		dbURL = fmt.Sprintf(
+
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		os.Getenv("DB_HOST"),
 		os.Getenv("POSTGRES_USER"),
@@ -19,13 +25,17 @@ func Connect() *gorm.DB{
 		os.Getenv("POSTGRES_DB"),
 		os.Getenv("DB_PORT"),
 	)
+		log.Println("🔧 Using individual DB environment variables")
+	} else {
+		log.Println("🔗 Using DATABASE_URL connection string")
+	}
 
 
 	maxRetries := 20
 	retryDelay := 3 * time.Second
 
 	for i := 0; i < maxRetries; i++ {
-		db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+		db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
 		if err == nil {
 			log.Println("✅ Connected to PostgreSQL successfully")
 			return db
