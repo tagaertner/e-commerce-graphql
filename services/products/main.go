@@ -33,7 +33,6 @@ func main() {
         log.Println("📦 Running in containerized environment, using system environment variables")
     }
     
-    // ... rest of your code
     // Flag to check the database connection and exit
 	testDB := flag.Bool("test-db", false, "Test DB connection and exit")
 	flag.Parse()
