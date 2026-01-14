@@ -11,7 +11,7 @@ import(
 )
 
 func Connect() *gorm.DB{
-	// Tyr DATABASE_URL first for Render/production
+	// Try DATABASE_URL first for Render/production
 	dbURL := os.Getenv("DATABASE_URL")
 
 	// Fallback to individual vars for local dev
