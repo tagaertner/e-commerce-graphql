@@ -74,7 +74,7 @@ services:
     plan: free
     envVars:
       - key: GRAPHQL_ENDPOINT
-        fromService: { type: web, name: gateway, property: hostport }
+        fromService: { type: web, name: gateway, property: host }
 
 databases:
   - name: products-db
