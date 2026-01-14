@@ -10,49 +10,58 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "22.16.0"
-      - key: PRODUCTS_HOSTPORT
-        fromService: { type: pserv, name: products, property: hostport }
-      - key: USERS_HOSTPORT
-        fromService: { type: pserv, name: users, property: hostport }
-      - key: ORDERS_HOSTPORT
-        fromService: { type: pserv, name: orders, property: hostport }
+      - key: PRODUCTS_URL
+        fromService:
+          type: web
+          name: products
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: USERS_URL
+        fromService:
+          type: web
+          name: users
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: ORDERS_URL
+        fromService:
+          type: web
+          name: orders
+          envVarKey: RENDER_EXTERNAL_URL
 
-  # Products (Go, private)
-  - type: pserv
+  # Products (Go, public)
+  - type: web
     name: products
     runtime: docker
-    dockerfilePath: ./services/products/dockerfile
+    dockerfilePath: ./services/products/Dockerfile
     dockerContext: ./services/products
-    plan: starter
+    plan: free
     envVars:
       - key: PORT
-        value: "4001"
+        value: "10000"
       - key: DATABASE_URL
         fromDatabase: { name: products-db, property: connectionString }
 
-  # Users (Go, private)
-  - type: pserv
+  # Users (Go, public)
+  - type: web
     name: users
     runtime: docker
-    dockerfilePath: ./services/users/dockerfile
+    dockerfilePath: ./services/users/Dockerfile
     dockerContext: ./services/users
-    plan: starter
+    plan: free
     envVars:
       - key: PORT
-        value: "4002"
+        value: "10000"
       - key: DATABASE_URL
         fromDatabase: { name: products-db, property: connectionString }
 
-  # Orders (Go, private)
-  - type: pserv
+  # Orders (Go, public)
+  - type: web
     name: orders
     runtime: docker
-    dockerfilePath: ./services/orders/dockerfile
+    dockerfilePath: ./services/orders/Dockerfile
     dockerContext: ./services/orders
-    plan: starter
+    plan: free
     envVars:
       - key: PORT
-        value: "4003"
+        value: "10000"
       - key: DATABASE_URL
         fromDatabase: { name: products-db, property: connectionString }
 
