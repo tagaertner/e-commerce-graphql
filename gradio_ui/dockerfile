@@ -7,7 +7,7 @@ COPY . .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir gradio==4.38.0 huggingface_hub==0.19.4 requests
 
-EXPOSE 4004
+EXPOSE 10000
 
 ENV GRADIO_ANALYTICS_ENABLED="False"
 ENV PYTHONPATH=/app
