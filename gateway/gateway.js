@@ -24,6 +24,8 @@ function pickUrl(name, port) {
   const hostport = process.env[`${U}_HOSTPORT`];
   if (hostport) return `http://${hostport}${DEFAULT_PATH}`;
 
+  console.log(`🔍 Checking ${name}: FULL=${full}, HOSTPORT=${hostport}`);
+
   // 3) Local Docker fallback (Docker Compose service DNS)
   return `http://${name}:${port}${DEFAULT_PATH}`;
 }
