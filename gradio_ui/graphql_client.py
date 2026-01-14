@@ -1,8 +1,9 @@
 import requests
 import os
 
-GATEWAY_HOST = os.getenv('GRAPHQL_ENDPOINT', 'localhost:4000')
-GQL_ENDPOINT = f"https://{GATEWAY_HOST}/query"
+# GATEWAY_HOST = os.getenv('GRAPHQL_ENDPOINT', 'localhost:4000')
+# GQL_ENDPOINT = f"https://{GATEWAY_HOST}/query"
+GRAPHQL_URL = os.getenv("GRAPHQL_URL", "https://gateway-render-e-commerce-graphql.onrender.com/query")
 
 # GQL_ENDPOINT = os.getenv("GQL_ENDPOINT", "http://localhost:4000/graphql")
 
@@ -10,7 +11,7 @@ GQL_ENDPOINT = f"https://{GATEWAY_HOST}/query"
 def gql_request(query, variables=None):
     try:
         response = requests.post(
-            GQL_ENDPOINT,
+            GRAPHQL_URL,
             json={"query": query, "variables": variables or {}},
             headers={"Content-Type": "application/json"}
         )
