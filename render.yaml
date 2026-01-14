@@ -72,6 +72,9 @@ services:
     dockerfilePath: ./gradio_ui/dockerfile
     dockerContext: ./gradio_ui
     plan: free
+    envVars:
+      - key: GRAPHQL_ENDPOINT
+        fromService: { type: web, name: gateway, property: hostport }
 
 databases:
   - name: products-db
