@@ -26,8 +26,14 @@ services:
     dockerContext: ./services/products
     plan: starter
     envVars:
-      - key: PORT
-        value: "4001"
+      # - key: PORT
+      #   value: "4001"
+      - key: PRODUCTS_HOSTPORT
+          fromService:
+          type: pserv
+          name: products
+          property: hostport
+
       # Use the DB connection string Render exposes
       - key: DATABASE_URL
         fromDatabase: { name: products-db, property: connectionString }
@@ -40,8 +46,13 @@ services:
     dockerContext: ./services/users
     plan: starter
     envVars:
-      - key: PORT
-        value: "4002"
+      # - key: PORT
+      #   value: "4002"
+      - key: USERS_HOSTPORT
+        fromService:
+          type: pserv
+          name: users
+          property: hostport
       - key: DATABASE_URL
         fromDatabase: { name: products-db, property: connectionString }
 
@@ -53,8 +64,13 @@ services:
     dockerContext: ./services/orders
     plan: starter
     envVars:
-      - key: PORT
-        value: "4003"
+      # - key: PORT
+      #   value: "4003"
+      - key: ORDERS_HOSTPORT
+        fromService:
+          type: pserv
+          name: orders
+          property: hostport
       - key: DATABASE_URL
         fromDatabase: { name: products-db, property: connectionString }
 
