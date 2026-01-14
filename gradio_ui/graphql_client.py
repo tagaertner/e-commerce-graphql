@@ -1,7 +1,7 @@
 import requests
 import os
 
-GQL_ENDPOINT = os.getenv("GRAPHQL_ENDPOINT", "http://gateway:4000/graphql")
+GQL_ENDPOINT = os.getenv("GRAPHQL_ENDPOINT", "http://gateway:4000/query")
 
 # GQL_ENDPOINT = os.getenv("GQL_ENDPOINT", "http://localhost:4000/graphql")
 
