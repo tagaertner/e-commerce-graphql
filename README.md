@@ -17,7 +17,10 @@ This project demonstrates **backend architecture**, **service composition**, and
 
 ### E-Commerce UI Demo
 
-[![▶️ E-Commerce Demo](assets/e-commerce-demo.gif)](https://raw.githubusercontent.com/tagaertner/e-commerce-graphql/render/assets/e-commerce-demo.mp4)
+
+https://github.com/user-attachments/assets/8176fa10-a4d4-4653-84bb-032f2cb8c933
+
+
 
 ### GraphQL Demo
 
