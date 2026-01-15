@@ -4,11 +4,15 @@ A production-style **microservices backend** built with **Go**, **GraphQL Federa
 
 This project demonstrates **backend architecture**, **service composition**, and **stateful system design** with real-world deployment considerations.
 
+## E-Commerce Video Demo
+
+**Click the preview to watch with audio.**
+
+[![▶️ E-Commerce Demo](assets/e-commerce-demo.gif)](https://raw.githubusercontent.com/tagaertner/e-commerce-graphql/render/assets/e-commerce-demo.mp4)
+
+> Click to watch with audio.
+
 ## Live Demo:
-
-## E-Commerce Demo
-
-[![E-Commerce Demo](assets/e-commerce-demo.gif)](https://raw.githubusercontent.com/tagaertner/e-commerce-graphql/render/assets/e-commerce-demo.mp4)
 
 - [Gradio UI](https://gradio-ui-render-e-commerce-graphql.onrender.com)
 - [GraphQL Gateway](https://gateway-render-e-commerce-graphql.onrender.com)
