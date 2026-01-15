@@ -8,14 +8,9 @@ This project demonstrates **backend architecture**, **service composition**, and
 
 ## E-Commerce Demo
 
-<video src="https://raw.githubusercontent.com/tagaertner/e-commerce-graphql/main/assets/e-commerce-demo.mp4"
-       title="E-Commerce Demo" controls width="720"></video>
+![E-Commerce Demo](assets/e-commerce-demo.gif)
 
-## E-Commerce Demo
-
-<video src="https://github.com/tagaertner/e-commerce-graphql/blob/main/assets/e-commerce-demo.mp4?raw=1"
-       title="E-Commerce Demo" controls width="720"></video>
-[Download the MP4](assets/e-commerce-demo.mp4)
+[Watch the full MP4](assets/e-commerce-demo.mp4)
 
 - [Gradio UI](https://gradio-ui-render-e-commerce-graphql.onrender.com)
 - [GraphQL Gateway](https://gateway-render-e-commerce-graphql.onrender.com)
