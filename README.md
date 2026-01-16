@@ -24,9 +24,8 @@ https://github.com/user-attachments/assets/8176fa10-a4d4-4653-84bb-032f2cb8c933
 
 ### GraphQL Demo
 
-[![▶️ GraphQL Demo](assets/graphql-demo.gif)](https://raw.githubusercontent.com/tagaertner/e-commerce-graphql/render/assets/graphql-demo.mp4)
+https://github.com/user-attachments/assets/a79566af-e485-46d7-9b76-c01a3b7c6ba2
 
-> Click a preview to watch with audio.
 
 ## Quick Start
 
