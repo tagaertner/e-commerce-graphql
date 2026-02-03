@@ -28,7 +28,7 @@ function isTransientStartupError(err) {
   );
 }
 
-async function withRetry(fn, { maxAttempts = 8, baseDelayMs = 1500, maxDelayMs = 20000 } = {}) {
+async function withRetry(fn, { maxAttempts = 12, baseDelayMs = 5000, maxDelayMs = 60000 } = {}) {
   let attempt = 0;
   while (true) {
     attempt += 1;
@@ -88,7 +88,7 @@ async function startServer() {
         }),
         // Polling can cause repeated schema fetches (extra traffic).
         // Consider increasing or disabling for Render demos.
-        pollIntervalInMs: 60000,
+        // pollIntervalInMs: 60000,
         buildService: ({ url }) =>
           new RemoteGraphQLDataSource({
             url,
