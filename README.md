@@ -4,6 +4,12 @@ A production-style **microservices backend** built with **Go**, **GraphQL Federa
 
 This project demonstrates **backend architecture**, **service composition**, and **stateful system design** with real-world deployment considerations.
 
+## Demo & Availability
+
+This project has a hosted demo on Render. It can be slow or unavailable at times due to cold starts or rate limiting.
+
+For a smoother experience, run the project locally with Docker Compose. See **Run Locally** below.
+
 ## Try it yourself
 
 **Live apps**
@@ -17,15 +23,11 @@ This project demonstrates **backend architecture**, **service composition**, and
 
 ### E-Commerce UI Demo
 
-
 https://github.com/user-attachments/assets/8176fa10-a4d4-4653-84bb-032f2cb8c933
-
-
 
 ### GraphQL Demo
 
 https://github.com/user-attachments/assets/a79566af-e485-46d7-9b76-c01a3b7c6ba2
-
 
 ## Quick Start
 
