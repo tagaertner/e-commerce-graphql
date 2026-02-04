@@ -6,7 +6,6 @@ services:
     image: postgres:16
     ports:
       - "${DB_PORT_HOST:-5432}:5432"
-      # - "55432:5432"
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -26,10 +25,7 @@ services:
     build:
       context: ./services/products
       dockerfile: dockerfile
-    # env_file:
-    #   - ./services/products/.env
     ports:
-      # - "${PORT_PRODUCTS}:4001"
       - "${PORT_PRODUCTS:-4001}:4001"
     environment:
       - DB_HOST=db
@@ -53,10 +49,7 @@ services:
     build:
       context: ./services/orders
       dockerfile: dockerfile
-    # env_file:
-    #   - ./services/orders/.env
     ports:
-      # - "${PORT_ORDERS}:4003"
       - "${PORT_ORDERS:-4003}:4003"
     environment:
       - DB_HOST=db
@@ -80,10 +73,7 @@ services:
     build:
       context: ./services/users
       dockerfile: dockerfile
-    # env_file:
-    #   - ./services/users/.env
     ports:
-      # - "${PORT_USERS}:4002"
       - "${PORT_USERS:-4002}:4002"
     environment:
       - DB_HOST=db
@@ -108,12 +98,12 @@ services:
       context: .
       dockerfile: gradio_ui/dockerfile
     ports:
-      # - "${PORT_GRADIO}:4004"
-      - "${PORT:-4004}:4004"
+      - "4004:7860"
+    environment:
+      - PORT=7860
+      - GATEWAY_URL=http://gateway:4000/query
     depends_on:
       - gateway
-    # env_file:
-    #   - .env
 
   # Seed runs after services create tables
   db-seed:
@@ -146,10 +136,7 @@ services:
     build:
       context: .
       dockerfile: gateway/dockerfile
-    # env_file:
-    #   - .env
     ports:
-      # - "${PORT_GATEWAY}:4000"
       - "${PORT_GATEWAY:-4000}:4000"
     depends_on:
       orders:

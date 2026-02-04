@@ -1,12 +1,9 @@
 import requests
 import os
 
-# GATEWAY_HOST = os.getenv('GRAPHQL_ENDPOINT', 'localhost:4000')
-# GQL_ENDPOINT = f"https://{GATEWAY_HOST}/query"
-GRAPHQL_URL = os.getenv("GRAPHQL_URL", "https://gateway-render-e-commerce-graphql.onrender.com/query")
-
-# GQL_ENDPOINT = os.getenv("GQL_ENDPOINT", "http://localhost:4000/graphql")
-
+# GRAPHQL_URL = os.getenv("GRAPHQL_URL", "https://gateway-render-e-commerce-graphql.onrender.com/query")
+# Prefer local compose env var; fall back to Render for hosted demo.
+GRAPHQL_URL = os.getenv("GATEWAY_URL") or os.getenv("GRAPHQL_URL") or "https://gateway-render-e-commerce-graphql.onrender.com/query"
 
 def gql_request(query, variables=None):
     try:

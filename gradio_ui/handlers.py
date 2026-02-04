@@ -77,17 +77,7 @@ def handle_create_user(name, email, password,  active):
 # ADMIN
 def handle_list_users(event: gr.SelectData):
     pass
-    # event.value → the selected cell value
-    # event.index → (row_index, col_index)
-
-    # _, col = event.index
-
-    # # Only allow clicking on the first column (user ID)
-    # if col != 0:
-    #     return "", "❌ You can only select by clicking the User ID column."
-
-    # user_id = event.value
-    # return user_id, f"✅ Selected User ID: {user_id}"
+  
 
 # Admin-only (stub)
 def handle_get_user(user_id):

@@ -1,16 +1,16 @@
 FROM python:3.11-slim
 
 # WORKDIR /app
-WORKDIR /app/gradio_ui
+WORKDIR /app
 
 COPY . .
 
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir gradio==4.38.0 huggingface_hub==0.19.4 requests
 
-EXPOSE 10000
+EXPOSE 7860
 
 ENV GRADIO_ANALYTICS_ENABLED="False"
 ENV PYTHONPATH=/app
 
-CMD ["python", "app.py"]
+CMD ["python", "gradio_ui/app.py"]
