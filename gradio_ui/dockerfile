@@ -13,4 +13,4 @@ EXPOSE 7860
 ENV GRADIO_ANALYTICS_ENABLED="False"
 ENV PYTHONPATH=/app
 
-CMD ["python", "gradio_ui/app.py"]
+CMD ["python", "app.py"]

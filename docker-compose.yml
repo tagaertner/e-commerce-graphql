@@ -95,8 +95,8 @@ services:
   # Gradio Frontend Service (Python)
   gradio-ui:
     build:
-      context: .
-      dockerfile: gradio_ui/dockerfile
+      context: ./gradio_ui
+      dockerfile: dockerfile
     ports:
       - "4004:7860"
     environment:
