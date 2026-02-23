@@ -1,6 +1,6 @@
 # E-Commerce GraphQL Microservices Platform
 
-A production-style **microservices backend** built with **Go**, **GraphQL Federation**, and **PostgreSQL**, featuring a lightweight Python **Gradio UI** for end-to-end API validation and exploration. Deployed on Render.
+A production-style **microservices backend** built with **Go**, **GraphQL Federation**, and **PostgreSQL**, featuring a lightweight Python **Gradio UI** for end-to-end API validation and exploration. Deployed on Render and Neon for the Database. 
 
 This project demonstrates **backend architecture**, **service composition**, and **stateful system design** with real-world deployment considerations.
 
