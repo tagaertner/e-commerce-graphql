@@ -14,12 +14,6 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     demo = build_interface()
     
-    print(f"🚀 Starting Gradio on port {port}")
     
-    demo.launch(
-        server_name="0.0.0.0", 
-        server_port=port,
-        root_path="/",
-        share=False
-        )
+    demo.launch()
  

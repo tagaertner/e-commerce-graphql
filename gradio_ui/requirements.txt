@@ -6,3 +6,4 @@ requests
 strawberry-graphql
 fastapi
 uvicorn
+jinja2
