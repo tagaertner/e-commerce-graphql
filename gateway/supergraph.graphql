@@ -1,0 +1,247 @@
+schema
+  @link(url: "https://specs.apollo.dev/link/v1.0")
+  @link(url: "https://specs.apollo.dev/join/v0.3", for: EXECUTION)
+{
+  query: Query
+  mutation: Mutation
+}
+
+directive @join__enumValue(graph: join__Graph!) repeatable on ENUM_VALUE
+
+directive @join__field(graph: join__Graph, requires: join__FieldSet, provides: join__FieldSet, type: String, external: Boolean, override: String, usedOverridden: Boolean) repeatable on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+directive @join__graph(name: String!, url: String!) on ENUM_VALUE
+
+directive @join__implements(graph: join__Graph!, interface: String!) repeatable on OBJECT | INTERFACE
+
+directive @join__type(graph: join__Graph!, key: join__FieldSet, extension: Boolean! = false, resolvable: Boolean! = true, isInterfaceObject: Boolean! = false) repeatable on OBJECT | INTERFACE | UNION | ENUM | INPUT_OBJECT | SCALAR
+
+directive @join__unionMember(graph: join__Graph!, member: String!) repeatable on UNION
+
+directive @link(url: String, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
+
+input ChangeOrderQuantityInput
+  @join__type(graph: ORDERS)
+{
+  orderId: ID!
+  quantity: Int!
+}
+
+input CreateOrderInput
+  @join__type(graph: ORDERS)
+{
+  userId: ID!
+  productIds: [ID!]!
+  quantity: Int!
+  totalPrice: Float!
+  status: String!
+  createdAt: Time!
+}
+
+input CreateProductInput
+  @join__type(graph: PRODUCTS)
+{
+  name: String!
+  price: Float!
+  description: String!
+  inventory: Int!
+}
+
+input CreateUserInput
+  @join__type(graph: USERS)
+{
+  name: String!
+  email: String!
+  password: String!
+  role: Role = CUSTOMER
+  active: Boolean = true
+}
+
+input DeleteOrderInput
+  @join__type(graph: ORDERS)
+{
+  orderId: ID!
+  userId: ID!
+}
+
+input DeleteProductInput
+  @join__type(graph: PRODUCTS)
+{
+  id: ID
+  name: String
+}
+
+scalar join__FieldSet
+
+enum join__Graph {
+  ORDERS @join__graph(name: "orders", url: "https://onrender.com")
+  PRODUCTS @join__graph(name: "products", url: "https://onrender.com")
+  USERS @join__graph(name: "users", url: "https://user-render-e-commercegraphql.onrender.com/query")
+}
+
+scalar link__Import
+
+enum link__Purpose {
+  """
+  `SECURITY` features provide metadata necessary to securely resolve fields.
+  """
+  SECURITY
+
+  """
+  `EXECUTION` features provide metadata necessary for operation execution.
+  """
+  EXECUTION
+}
+
+type Mutation
+  @join__type(graph: ORDERS)
+  @join__type(graph: PRODUCTS)
+  @join__type(graph: USERS)
+{
+  createOrder(input: CreateOrderInput!): Order! @join__field(graph: ORDERS)
+  updateOrder(input: UpdateOrderInput!): Order! @join__field(graph: ORDERS)
+  deleteOrder(input: DeleteOrderInput!): Boolean! @join__field(graph: ORDERS)
+  setOrderStatus(input: SetOrderStatusInput!): Order! @join__field(graph: ORDERS)
+  changeOrderQuantity(input: ChangeOrderQuantityInput!): Order! @join__field(graph: ORDERS)
+  createProduct(input: CreateProductInput!): Product! @join__field(graph: PRODUCTS)
+  updateProduct(id: ID!, input: UpdateProductInput!): Product! @join__field(graph: PRODUCTS)
+  deleteProduct(input: DeleteProductInput!): Boolean! @join__field(graph: PRODUCTS)
+  restockProduct(input: RestockProductInput!): Product! @join__field(graph: PRODUCTS)
+  setProductAvailability(input: SetProductAvailabilityInput!): Product! @join__field(graph: PRODUCTS)
+  createUser(input: CreateUserInput!): User! @join__field(graph: USERS)
+  updateUser(id: ID!, input: UpdateUserInput!): User! @join__field(graph: USERS)
+  deleteUser(id: ID!): Boolean! @join__field(graph: USERS)
+}
+
+type Order
+  @join__type(graph: ORDERS, key: "id")
+{
+  id: ID!
+  userId: ID!
+  user: User!
+  products: [Product!]!
+  quantity: Int!
+  totalPrice: Float!
+  status: String!
+  createdAt: Time!
+}
+
+type PageInfo
+  @join__type(graph: PRODUCTS)
+{
+  hasNextPage: Boolean!
+  endCursor: String
+}
+
+type Product
+  @join__type(graph: ORDERS, key: "id")
+  @join__type(graph: PRODUCTS, key: "id")
+{
+  id: ID!
+  name: String!
+  price: Float! @join__field(graph: PRODUCTS)
+  description: String @join__field(graph: PRODUCTS)
+  inventory: Int! @join__field(graph: PRODUCTS)
+  available: Boolean! @join__field(graph: PRODUCTS)
+}
+
+type ProductConnection
+  @join__type(graph: PRODUCTS)
+{
+  edges: [ProductEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type ProductEdge
+  @join__type(graph: PRODUCTS)
+{
+  cursor: String!
+  node: Product!
+}
+
+type Query
+  @join__type(graph: ORDERS)
+  @join__type(graph: PRODUCTS)
+  @join__type(graph: USERS)
+{
+  orders: [Order!]! @join__field(graph: ORDERS)
+  order(id: ID!): Order @join__field(graph: ORDERS)
+  ordersByUser(userId: ID!): [Order!]! @join__field(graph: ORDERS)
+  product(id: ID!): Product @join__field(graph: PRODUCTS)
+  products: [Product!]! @join__field(graph: PRODUCTS)
+  productsCursor(after: String, first: Int = 10): ProductConnection! @join__field(graph: PRODUCTS)
+  users: [User!]! @join__field(graph: USERS)
+  user(id: ID!): User @join__field(graph: USERS)
+}
+
+input RestockProductInput
+  @join__type(graph: PRODUCTS)
+{
+  id: ID!
+  quantity: Int!
+}
+
+enum Role
+  @join__type(graph: USERS)
+{
+  ADMIN @join__enumValue(graph: USERS)
+  CUSTOMER @join__enumValue(graph: USERS)
+}
+
+input SetOrderStatusInput
+  @join__type(graph: ORDERS)
+{
+  orderId: ID!
+  status: String!
+}
+
+input SetProductAvailabilityInput
+  @join__type(graph: PRODUCTS)
+{
+  id: ID!
+  available: Boolean!
+}
+
+scalar Time
+  @join__type(graph: ORDERS)
+
+input UpdateOrderInput
+  @join__type(graph: ORDERS)
+{
+  orderId: ID!
+  quantity: Int
+  totalPrice: Float
+  status: String
+}
+
+input UpdateProductInput
+  @join__type(graph: PRODUCTS)
+{
+  name: String
+  price: Float
+  description: String
+  inventory: Int
+}
+
+input UpdateUserInput
+  @join__type(graph: USERS)
+{
+  id: ID!
+  name: String
+  email: String
+  role: Role
+  active: Boolean
+}
+
+type User
+  @join__type(graph: ORDERS, key: "id")
+  @join__type(graph: USERS, key: "id")
+{
+  id: ID!
+  orders: [Order] @join__field(graph: ORDERS)
+  name: String! @join__field(graph: USERS)
+  email: String! @join__field(graph: USERS)
+  role: Role! @join__field(graph: USERS)
+  active: Boolean! @join__field(graph: USERS)
+}

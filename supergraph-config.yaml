@@ -1,0 +1,14 @@
+federation_version: 2
+subgraphs:
+  products:
+    routing_url: https://onrender.com
+    schema:
+      subgraph_url: https://products-render-ecommercegraphql.onrender.com/query
+  users:
+    routing_url: https://user-render-e-commercegraphql.onrender.com/query
+    schema:
+      subgraph_url: https://user-render-e-commercegraphql.onrender.com/query
+  orders:
+    routing_url: https://onrender.com
+    schema:
+      subgraph_url: https://order-render-e-commerce-graphql.onrender.com/query
