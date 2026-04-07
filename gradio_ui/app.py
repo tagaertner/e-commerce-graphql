@@ -9,12 +9,14 @@ Loads components and assembles the UI.
 """
 
 
-# if __name__ == "__main__":
-#     demo = build_interface()
-#     demo.launch(server_name="0.0.0.0", server_port=4004)
     
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 7860))
     demo = build_interface()
-    demo.launch(server_name="0.0.0.0", server_port=port)
+    demo.launch(
+        server_name="0.0.0.0", 
+        server_port=port,
+        ssr_mode=False,
+        share=False
+        )
  
