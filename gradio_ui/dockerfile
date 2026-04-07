@@ -1,16 +1,18 @@
 FROM python:3.11-slim
 
-# WORKDIR /app
 WORKDIR /app
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir gradio==4.38.0 huggingface_hub==0.19.4 requests
+EXPOSE 10000
 
-EXPOSE 7860
-
-ENV GRADIO_ANALYTICS_ENABLED="False"
+ENV GRADIO_ANALYTICS_ENABLED=False
 ENV PYTHONPATH=/app
+ENV GRADIO_SERVER_NAME=0.0.0.0
+ENV GRADIO_SERVER_PORT=10000
 
 CMD ["python", "app.py"]

@@ -18,7 +18,8 @@ if __name__ == "__main__":
     demo.launch(
         server_name="0.0.0.0", 
         server_port=port,
-        share=False
+        prevent_thread_lock=False,
+        show_error=True
     )
 
  

@@ -81,6 +81,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+
     depends_on:
       db:
         condition: service_healthy
@@ -101,10 +102,13 @@ services:
       - "4004:10000"
     environment:
       - PORT=10000
-      - GATEWAY_URL=http://gateway:4000/query
+      - GRADIO_SERVER_NAME=0.0.0.0
+      - GRADIO_SERVER_PORT=10000
+      - GRADIO_SSR_MODE=false
+      - no_proxy=localhost,127.0.0.1,0.0.0.0
+      - GATEWAY_URL=http://gateway:10000/query
     depends_on:
       - gateway
-
   # Seed runs after services create tables
   db-seed:
     image: postgres:16
@@ -137,7 +141,7 @@ services:
       context: .
       dockerfile: gateway/dockerfile
     ports:
-      - "${PORT_GATEWAY:-4000}:4000"
+      - "${PORT_GATEWAY:-4000}:10000"
     depends_on:
       orders:
         condition: service_started
