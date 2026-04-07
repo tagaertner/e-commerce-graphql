@@ -9,7 +9,7 @@ RUN npm install
 # Copy the rest of the gateway files
 COPY gateway/ .
 
-ENV PORT=4000
-EXPOSE 4000
+ENV PORT=10000
+EXPOSE 10000
 
 CMD ["node", "gateway.js"]
