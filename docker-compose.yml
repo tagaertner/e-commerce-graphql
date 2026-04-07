@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  # 🗃️ PostgreSQL Database
+  # 🗃️ PostgreSQL Database (local, optional now)
   db:
     image: postgres:16
     ports:
@@ -28,14 +28,7 @@ services:
     ports:
       - "${PORT_PRODUCTS:-4001}:4001"
     environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-    depends_on:
-      db:
-        condition: service_healthy
+      - DATABASE_URL=${DATABASE_URL}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4001/graphql"]
@@ -52,14 +45,7 @@ services:
     ports:
       - "${PORT_ORDERS:-4003}:4003"
     environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-    depends_on:
-      db:
-        condition: service_healthy
+      - DATABASE_URL=${DATABASE_URL}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4003/graphql"]
@@ -76,15 +62,7 @@ services:
     ports:
       - "${PORT_USERS:-4002}:4002"
     environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-
-    depends_on:
-      db:
-        condition: service_healthy
+      - DATABASE_URL=${DATABASE_URL}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4002/graphql"]
@@ -109,29 +87,20 @@ services:
       - GATEWAY_URL=http://gateway:10000/query
     depends_on:
       - gateway
-  # Seed runs after services create tables
+
+  # Seed runs after services create tables (local DB only; not used with Neon)
   db-seed:
     image: postgres:16
     depends_on:
       db:
         condition: service_healthy
-      users:
-        condition: service_started
-      products:
-        condition: service_started
-      orders:
-        condition: service_started
     environment:
       - PGPASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - ./database/init/01-seed-data.sql:/seed-data.sql
     command: >
       bash -c "
-        echo 'Waiting for services to create tables...' &&
-        sleep 15 &&
-        echo 'Running seed data...' &&
-        psql -h db -U ${POSTGRES_USER} -d ${POSTGRES_DB} -f /seed-data.sql &&
-        echo 'Seed data completed successfully!'
+        echo 'Skipping local seed because services use Neon'
       "
     restart: "no"
 
@@ -149,8 +118,6 @@ services:
         condition: service_started
       products:
         condition: service_started
-      db-seed:
-        condition: service_completed_successfully
     restart: unless-stopped
 
 volumes:

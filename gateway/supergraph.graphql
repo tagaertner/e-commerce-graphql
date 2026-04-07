@@ -74,8 +74,8 @@ input DeleteProductInput
 scalar join__FieldSet
 
 enum join__Graph {
-  ORDERS @join__graph(name: "orders", url: "https://onrender.com")
-  PRODUCTS @join__graph(name: "products", url: "https://onrender.com")
+  ORDERS @join__graph(name: "orders", url: "https://order-render-e-commerce-graphql.onrender.com/query")
+  PRODUCTS @join__graph(name: "products", url: "https://products-render-ecommercegraphql.onrender.com/query")
   USERS @join__graph(name: "users", url: "https://user-render-e-commercegraphql.onrender.com/query")
 }
 
