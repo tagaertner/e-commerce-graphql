@@ -15,5 +15,5 @@ if __name__ == "__main__":
     demo = build_interface()
     
     
-    demo.launch()
+    demo.launch(share=False)
  
