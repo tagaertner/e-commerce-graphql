@@ -1,7 +1,10 @@
 const { ApolloGateway, RemoteGraphQLDataSource } = require("@apollo/gateway");
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
-const { ApolloServerPluginLandingPageLocalDefault } = require("@apollo/server/plugin/landingPage/default");
+const {
+  ApolloServerPluginLandingPageLocalDefault,
+  ApolloServerPluginLandingPageProductionDefault,
+} = require("@apollo/server/plugin/landingPage/default");
 const { readFileSync } = require("fs");
 
 function sleep(ms) {
@@ -63,39 +66,26 @@ async function startServer() {
       gateway,
       introspection: true,
       csrfPrevention: { requestHeaders: ["apollo-required-preflight"] },
-      plugins: isProd
-        ? [
-            {
-              requestDidStart() {
-                return {
-                  didResolveOperation(rc) {
-                    console.log(`📊 Query: ${rc.request.operationName || "Anonymous"}`);
-                  },
-                  didEncounterErrors(rc) {
-                    console.error("❌ GraphQL errors:", rc.errors);
-                  },
-                };
-              },
-            },
-          ]
-        : [
-            ApolloServerPluginLandingPageLocalDefault({
+      plugins: [
+        isProd
+          ? ApolloServerPluginLandingPageProductionDefault({ embed: true })
+          : ApolloServerPluginLandingPageLocalDefault({
               embed: true,
               settings: { "editor.theme": "dark", "editor.fontSize": 14 },
             }),
-            {
-              requestDidStart() {
-                return {
-                  didResolveOperation(rc) {
-                    console.log(`📊 Query: ${rc.request.operationName || "Anonymous"}`);
-                  },
-                  didEncounterErrors(rc) {
-                    console.error("❌ GraphQL errors:", rc.errors);
-                  },
-                };
+        {
+          requestDidStart() {
+            return {
+              didResolveOperation(rc) {
+                console.log(`📊 Query: ${rc.request.operationName || "Anonymous"}`);
               },
-            },
-          ],
+              didEncounterErrors(rc) {
+                console.error("❌ GraphQL errors:", rc.errors);
+              },
+            };
+          },
+        },
+      ],
       formatError: (error) => ({
         message: error.message,
         code: error.extensions?.code,
