@@ -4,7 +4,7 @@ import os
 """
 app.py
 ------
-Main Gradio application entry point.
+Main Gradio #application entry point.
 Loads components and assembles the UI.
 """
 
