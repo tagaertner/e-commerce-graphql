@@ -166,6 +166,7 @@ def create_order(input_data):
     mutation = """
     mutation CreateOrder($input: CreateOrderInput!) {
         createOrder(input: $input){
+            id
             userId
             quantity
             totalPrice
@@ -177,7 +178,6 @@ def create_order(input_data):
             }
         }
     }
-    
     """ 
     return gql_request(mutation, {"input": input_data})
 

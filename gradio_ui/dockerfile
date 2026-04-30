@@ -1,11 +1,14 @@
+# 
 FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY . .
+COPY gradio_ui/requirements.txt /app/gradio_ui/requirements.txt
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir gradio==4.38.0 huggingface_hub==0.19.4 requests
+    pip install --no-cache-dir -r /app/gradio_ui/requirements.txt
+
+COPY . .
 
 EXPOSE 4004
 
