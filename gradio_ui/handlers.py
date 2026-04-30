@@ -165,41 +165,108 @@ def handle_set_product_availability(product_id, available):
 ===========================
 """
 
-def handle_create_order(user_id, product_ids, quantity, total_price, status, created_at):
+def handle_create_user(name, email, password, active):
     variables = {
-        "input":{
-            "userId": user_id,
-            "productIds": product_ids,
-            "quantity": quantity,
-            "totalPrice": total_price,
-            "status": status,
-            "createdAt": created_at,
+        "input": {
+            "name": name,
+            "email": email,
+            "password": password,
+            "role": "CUSTOMER",
+            "active": active,
         }
     }
-    
-    result = gql_create_order(variables["input"])
-    
+
+    result = gql_create_user(variables["input"])
+
     if result is None:
-        return "❌ Error: No response from GraphQL server"
+        return "❌ Error: No response from GraphQL server", "", "", "", False, ""
+
     if "error" in result:
-        return f"❌ Error: {result['error']}"
-    if "createOrder" not in result:
-        return f"❌ Error: Unexpected response format: {result}"
-    
-    order = result["createOrder"]
-    
+        return f"❌ Error: {result['error']}", "", "", "", False, ""
+
+    if "createUser" not in result:
+        return f"❌ Error: Unexpected response format: {result}", "", "", "", False, ""
+
+    user = result["createUser"]
+
     message = (
-        f"🧾 Order Created!\n\n"
-        f"Order ID: {order['id']}\n"
-        f"User ID: {order['userId']}\n"
-        f"Products: {order['products']}\n"
-        f"Quantity: {order['quantity']}\n"
-        f"Total Price: {order['totalPrice']}\n"
-        f"Status: {order['status']}\n"
-        f"Created At: {order['createdAt']}\n"
+        f"✅ User Created!\n\n"
+        f"ID: {user['id']}\n"
+        f"Name: {user['name']}\n"
+        f"Email: {user['email']}\n"
+        f"Active: {user['active']}"
     )
 
-    return message
+    return message, "", "", "", False, user["id"]
+    
+def handle_add_to_basket(product_id, quantity, basket):
+    if not product_id:
+        return basket, basket, "❌ Please select a product."
+
+    if not quantity:
+        return basket, basket, "❌ Please enter a quantity."
+
+    result = gql_get_product_by_id(product_id)
+
+    if result is None or "error" in result:
+        return basket, basket, f"❌ Error getting product: {result}"
+
+    product = result.get("product")
+
+    if product is None:
+        return basket, basket, "❌ Product not found."
+
+    item = [
+        product["id"],
+        product["name"],
+        product["price"],
+        int(quantity),
+        float(product["price"]) * int(quantity),
+    ]
+
+    basket.append(item)
+
+    return basket, basket, "✅ Added to basket."
+
+
+def handle_create_order_from_basket(user_id, basket):
+    if not user_id:
+        return "❌ Please enter a User ID."
+
+    if not basket:
+        return "❌ Basket is empty."
+
+    product_ids = [item[0] for item in basket]
+    total_quantity = sum(item[3] for item in basket)
+    total_price = sum(item[4] for item in basket)
+
+    input_data = {
+        "userId": user_id,
+        "productIds": product_ids,
+        "quantity": total_quantity,
+        "totalPrice": total_price,
+        "status": "PENDING",
+        "createdAt": datetime.utcnow().isoformat() + "Z",
+    }
+
+    result = gql_create_order(input_data)
+
+    if result is None:
+        return "❌ Error: No response from GraphQL server"
+
+    if "error" in result:
+        return f"❌ Error: {result['error']}"
+
+    order = result["createOrder"]
+
+    return (
+        f"✅ Order Created!\n\n"
+        f"Order ID: {order['id']}\n"
+        f"User ID: {order['userId']}\n"
+        f"Quantity: {order['quantity']}\n"
+        f"Total Price: ${order['totalPrice']}\n"
+        f"Status: {order['status']}"
+    )
 
 # Admin-only (stub)
 def handle_list_orders():
