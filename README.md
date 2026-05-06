@@ -16,6 +16,8 @@ This project is hosted on Render’s free tier. Because the services can go idle
 
 If the live demo does not respond right away, warm up the Render services first.
 
+Run the following commands from your local terminal to wake the deployed Render services:
+
 ```bash
 curl -X POST https://gateway-render-e-commerce-graphql.onrender.com/ \
   -H "Content-Type: application/json" \
