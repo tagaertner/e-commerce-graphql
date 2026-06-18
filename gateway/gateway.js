@@ -65,7 +65,7 @@ async function startServer() {
     const server = new ApolloServer({
       gateway,
       introspection: true,
-      csrfPrevention: { requestHeaders: ["apollo-required-preflight"] },
+      csrfPrevention: false,
       plugins: [
         isProd
           ? ApolloServerPluginLandingPageProductionDefault({ embed: true })
