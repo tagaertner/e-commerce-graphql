@@ -1,6 +1,9 @@
+const express = require("express");
+const http = require("http");
+const cors = require("cors");
 const { ApolloGateway, RemoteGraphQLDataSource } = require("@apollo/gateway");
 const { ApolloServer } = require("@apollo/server");
-const { startStandaloneServer } = require("@apollo/server/standalone");
+const { expressMiddleware } = require("@apollo/server/express4");
 const {
   ApolloServerPluginLandingPageLocalDefault,
   ApolloServerPluginLandingPageProductionDefault,
@@ -93,12 +96,27 @@ async function startServer() {
       }),
     });
 
-    const { url } = await startStandaloneServer(server, {
-      listen: { port: Number(process.env.PORT) || 4000, host: "0.0.0.0" },
+    await server.start();
+
+    // ----  EXPRESS MIDDLEWARE SECTION ----
+    const app = express();
+    const httpServer = http.createServer(app);
+
+    app.get("/health", (req, res) => {
+      res.status(200).send("ok");
     });
 
+    app.use("/graphql", cors(), express.json(), expressMiddleware(server));
+
+    // End of express middleware
+
+    const PORT = Number(process.env.PORT) || 4000;
+
+    await new Promise((resolve) => httpServer.listen({ port: PORT, host: "0.0.0.0" }, resolve));
+
     console.log("✅ Federation Gateway Successfully Started!");
-    console.log(`🚀 Gateway ready at ${url}`);
+    console.log(`🚀 Gateway ready at http://0.0.0.0:${PORT}/graphql`);
+    console.log(`❤️  Health check at http://0.0.0.0:${PORT}/health`);
   } catch (error) {
     console.error("💥 Failed to start federation gateway:", error);
     process.exit(1);
