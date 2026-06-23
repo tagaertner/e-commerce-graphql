@@ -4,7 +4,7 @@ import os
 # GRAPHQL_URL = os.getenv("GRAPHQL_URL", "https://gateway-render-e-commerce-graphql.onrender.com/query")
 # Prefer local compose env var; fall back to Render for hosted demo.
 GRAPHQL_URL = os.getenv("GATEWAY_URL") or os.getenv("GRAPHQL_URL") or "https://gateway-render-e-commerce-graphql.onrender.com/graphql"
-
+print("GRAPHQL_URL:", GRAPHQL_URL)
 def gql_request(query, variables=None):
     try:
         response = requests.post(
